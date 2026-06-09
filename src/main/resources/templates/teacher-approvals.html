@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Duyệt Học Viên - FLearn</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-primary px-3 shadow-sm mb-4">
+    <a class="navbar-brand fw-bold" th:href="@{/teacher/class/{id}(id=${classId})}">⬅ Quay lại Lớp học</a>
+    <span class="text-white fw-bold" th:text="'Xét duyệt thành viên: ' + ${classroom.className}"></span>
+</nav>
+
+<div class="container">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white fw-bold fs-5">Danh Sách Đăng Ký Chờ Phê Duyệt</div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>Họ và Tên</th>
+                    <th>Tên đăng nhập (Username)</th>
+                    <th>Email</th>
+                    <th>Ngày yêu cầu</th>
+                    <th>Hành động</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="member : ${pendingMembers}">
+                    <td class="fw-bold text-dark" th:text="${member.student.fullName}"></td>
+                    <td th:text="${member.student.username}"></td>
+                    <td th:text="${member.student.email}"></td>
+                    <td th:text="${#dates.format(member.joinedAt, 'dd-MM-yyyy HH:mm')}"></td>
+                    <td>
+                        <form th:action="@{/teacher/class/{cId}/approve/{mId}(cId=${classId}, mId=${member.memberId})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-success fw-bold me-1">✓ Đồng ý</button>
+                        </form>
+                        <form th:action="@{/teacher/class/{cId}/reject/{mId}(cId=${classId}, mId=${member.memberId})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger fw-bold">✕ Từ chối</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(pendingMembers)}">
+                    <td colspan="5" class="text-center text-muted py-4">Hiện tại không có yêu cầu nào đang chờ xử lý.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
