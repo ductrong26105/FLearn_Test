@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-dark bg-success px-3 shadow-sm mb-4">
-    <a class="navbar-brand fw-bold" th:href="@{/student/dashboard}">⬅ Quay lại Bàn học</a>
+    <a class="navbar-brand fw-bold" th:href="@{/student/dashboard}">⬅ Quay lại </a>
     <span class="text-white">Nội dung Bài Giảng</span>
 </nav>
 
@@ -22,12 +22,30 @@
                     <p class="card-text fs-5" th:text="${lesson.content}"></p>
 
                     <div th:if="${lesson.videoUrl != null and !lesson.videoUrl.isEmpty()}" class="ratio ratio-16x9 mt-4 shadow-sm rounded overflow-hidden">
-                        <iframe th:src="${lesson.videoUrl}"
-                                title="YouTube video player"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen>
-                        </iframe>
+                        <iframe th:src="${lesson.videoUrl}" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-white border rounded d-flex justify-content-between align-items-center">
+
+                        <div th:if="${!quizService.isLessonCompleted(student, lesson.lessonId)}">
+                            <form th:action="@{/student/lesson/{lId}/complete(lId=${lesson.lessonId})}" method="post" class="d-inline">
+                                <input type="hidden" name="classId" th:value="${classId}">
+                                <button type="submit" class="btn btn-danger fw-bold">✓ Đã xem xong video & Hoàn thành bài học</button>
+                            </form>
+                            <span class="text-muted small ms-3">⚠️ Bạn cần bấm nút hoàn thành để kích hoạt bài kiểm tra Quiz.</span>
+                        </div>
+
+                        <div th:if="${quizService.isLessonCompleted(student, lesson.lessonId)}">
+                            <span class="badge bg-success fs-6 p-2">✓ Bạn đã hoàn thành nội dung bài học này</span>
+
+                            <a th:if="${quizService.getQuizByLesson(lesson.lessonId) != null}"
+                               th:href="@{/student/lesson/{lId}/quiz(lId=${lesson.lessonId})}"
+                               class="btn btn-primary fw-bold ms-3">
+                                📝 Làm Bài Kiểm Tra Quiz ngay
+                            </a>
+                            <span th:if="${quizService.getQuizByLesson(lesson.lessonId) == null}" class="text-muted small ms-2">(Bài học này không có Quiz)</span>
+                        </div>
+
                     </div>
                 </div>
             </div>

@@ -4,6 +4,7 @@ import flearn.entity.User;
 import flearn.security.CustomUserDetails;
 import flearn.service.ClassroomService;
 import flearn.service.LessonService;
+import flearn.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ public class TeacherController {
 
     private final ClassroomService classroomService;
     private final LessonService lessonService;
+    private final QuizService quizService;
 
     @GetMapping("/dashboard")
     public String teacherDashboard(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
@@ -79,5 +81,40 @@ public class TeacherController {
                                 @PathVariable("memberId") Integer memberId) {
         classroomService.rejectMember(memberId);
         return "redirect:/teacher/class/" + classId + "/approvals";
+    }
+    // Mở trang Quản lý Quiz của một bài học
+    @GetMapping("/lesson/{lessonId}/quiz")
+    public String manageQuiz(@PathVariable("lessonId") Integer lessonId, Model model) {
+        model.addAttribute("lessonId", lessonId);
+        model.addAttribute("quiz", quizService.getQuizByLesson(lessonId));
+        return "teacher-quiz-manager";
+    }
+
+    // Tạo tiêu đề Quiz
+    @PostMapping("/lesson/{lessonId}/quiz/create")
+    public String createQuiz(@PathVariable("lessonId") Integer lessonId, @RequestParam String title) {
+        quizService.createQuiz(lessonId, title);
+        return "redirect:/teacher/lesson/" + lessonId + "/quiz";
+    }
+
+    // Nhập 1 câu hỏi vào Quiz
+    @PostMapping("/quiz/{quizId}/add-question")
+    public String addQuestion(@PathVariable("quizId") Integer quizId,
+                              @RequestParam Integer lessonId,
+                              @RequestParam String questionText,
+                              @RequestParam String optionA,
+                              @RequestParam String optionB,
+                              @RequestParam String optionC,
+                              @RequestParam String optionD,
+                              @RequestParam String correctAnswer) {
+        quizService.addQuestion(quizId, questionText, optionA, optionB, optionC, optionD, correctAnswer);
+        return "redirect:/teacher/lesson/" + lessonId + "/quiz";
+    }
+    // Mở trang xem bảng điểm của bài Quiz
+    @GetMapping("/lesson/{lessonId}/quiz/results")
+    public String viewQuizResults(@PathVariable("lessonId") Integer lessonId, Model model) {
+        model.addAttribute("lessonId", lessonId);
+        model.addAttribute("results", quizService.getResultsByLesson(lessonId));
+        return "teacher-quiz-results";
     }
 }

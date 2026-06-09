@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-dark bg-primary px-3 shadow-sm mb-4">
-    <a class="navbar-brand fw-bold" th:href="@{/teacher/dashboard}">⬅ Quay lại Dashboard</a>
+    <a class="navbar-brand fw-bold" th:href="@{/teacher/dashboard}">⬅ Quay lại </a>
     <span class="text-white">Quản lý Nội dung Bài Giảng</span>
 </nav>
 
@@ -41,7 +41,11 @@
                 <div class="card-body">
                     <h5 class="card-title text-primary fw-bold" th:text="${lesson.title}"></h5>
                     <p class="card-text small text-muted" th:text="'Ngày đăng: ' + ${#dates.format(lesson.createdAt, 'dd-MM-yyyy HH:mm')}"></p>
+                    <p class="card-text small text-muted" th:text="'Ngày đăng: ' + ${#dates.format(lesson.createdAt, 'dd-MM-yyyy HH:mm')}"></p>
 
+                    <a th:href="@{/teacher/lesson/{id}/quiz(id=${lesson.lessonId})}" class="btn btn-sm btn-outline-danger fw-bold mb-3">
+                        📝 Soạn Bài Quiz cho bài học này
+                    </a>
                     <p class="card-text" th:text="${lesson.content}"></p>
 
                     <div th:if="${lesson.videoUrl != null and !lesson.videoUrl.isEmpty()}" class="ratio ratio-16x9 mt-3">

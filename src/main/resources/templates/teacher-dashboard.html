@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-dark bg-primary px-3 shadow-sm">
-    <a class="navbar-brand fw-bold" href="#">Không gian Giáo Viên - SE2029</a>
+    <a class="navbar-brand fw-bold" href="#">Trang Chủ Giáo Viên - FLearn</a>
     <div class="d-flex align-items-center">
         <span class="text-white me-3" th:text="'Xin chào, thầy/cô ' + ${teacherName}"></span>
         <form th:action="@{/logout}" method="post" class="d-inline">
@@ -25,7 +25,7 @@
                     <form th:action="@{/teacher/create-class}" method="post">
                         <div class="mb-3">
                             <label class="form-label small">Tên lớp (Môn học)</label>
-                            <input type="text" name="className" class="form-control" placeholder="VD: SWP391 - SE2029" required>
+                            <input type="text" name="className" class="form-control" placeholder="VD: SWP391 - ABC " required>
                         </div>
                         <button type="submit" class="btn btn-success w-100">Tạo Lớp</button>
                     </form>

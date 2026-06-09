@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - ACE TEAM LMS</title>
+    <title>Admin Dashboard - FLearn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
 <nav class="navbar navbar-dark bg-dark px-3 shadow-sm">
-    <a class="navbar-brand fw-bold" href="#">Admin Panel </a>
+    <a class="navbar-brand fw-bold" href="#">Admin  </a>
     <form th:action="@{/logout}" method="post" class="d-inline">
         <button type="submit" class="btn btn-sm btn-outline-light">Đăng xuất</button>
     </form>
@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-md-4">
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-primary text-white fw-bold">Cấp tài khoản Giáo viên</div>
+                <div class="card-header bg-primary text-white fw-bold">Cấp tài khoản giáo viên</div>
                 <div class="card-body">
                     <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
                     <form th:action="@{/admin/create-teacher}" method="post">
@@ -45,7 +45,7 @@
 
         <div class="col-md-8">
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white fw-bold">Quản lý Hệ thống Người dùng</div>
+                <div class="card-header bg-white fw-bold">Quản lý hệ thống người dùng</div>
                 <div class="card-body p-0">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
