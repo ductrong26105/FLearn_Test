@@ -21,7 +21,6 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/register", "/login", "/forgot-password", "/reset-password", "/verify-account").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/teacher/**").hasAnyRole("ADMIN", "TEACHER")
@@ -37,7 +36,13 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
+                )
+
+                .rememberMe(remember -> remember
+                        .key("BiMat") // Một chuỗi bí mật bất kỳ để mã hóa cookie
+                        .tokenValiditySeconds(7 * 24 * 60 * 60) // Thời gian nhớ: 7 ngày (tính bằng giây)
                 );
+
         return http.build();
     }
 }
