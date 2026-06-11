@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head(${pageTitle})}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('classes')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="breadcrumb-wrapper">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb" th:if="${roadmap != null}">
+                        <li class="breadcrumb-item"><a href="/teacher/classes">Lớp học</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{'/teacher/classes/' + ${roadmap.classRoom.classId} + '/roadmaps'}">Học liệu</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{'/teacher/roadmaps/' + ${roadmap.id} + '/edit'}">Cấu trúc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${pageTitle}">Bài học</li>
+                    </ol>
+                    <ol class="breadcrumb" th:if="${lesson != null}">
+                        <li class="breadcrumb-item"><a href="/teacher/classes">Lớp học</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{'/teacher/roadmaps/' + ${lesson.roadmapId} + '/edit'}">Cấu trúc</a></li>
+                        <li class="breadcrumb-item active" aria-current="page" th:text="${pageTitle}">Bài học</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="page-title text-dark" th:text="${pageTitle}">Bài học (Lesson)</h1>
+                    <p class="page-subtitle">Thêm tài liệu hướng dẫn, video, link bài đọc phục vụ bài học.</p>
+                </div>
+                <a th:if="${lesson != null}" class="btn btn-brand"
+                   th:href="@{/teacher/lessons/{id}/quizzes(id=${lesson.lessonId})}">
+                    Quản lý quiz
+                </a>
+            </div>
+            
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-5">
+                    <form th:action="@{${formAction}}" th:object="${lessonRequest}" method="post" class="panel">
+                        <div class="panel-body">
+                            <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-info-circle-fill me-2 text-primary"></i>Thông tin bài học</h5>
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tên bài học</label>
+                                <input class="form-control" th:field="*{title}" placeholder="Nhập tên bài học..." required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Mô tả bài học</label>
+                                <textarea class="form-control" th:field="*{description}" rows="3" placeholder="Mô tả nội dung bài học..."></textarea>
+                            </div>
+                            <div class="mb-3" style="max-width: 140px;">
+                                <label class="form-label fw-semibold">Thứ tự hiển thị</label>
+                                <input class="form-control" type="number" min="0" th:field="*{orderIndex}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    <i class="bi bi-play-circle me-1 text-danger"></i>Link Video bài học (YouTube / Google Drive)
+                                </label>
+                                <input class="form-control" th:field="*{videoUrl}"
+                                       placeholder="https://www.youtube.com/watch?v=... hoặc https://drive.google.com/...">
+                                <div class="form-text">Hỗ trợ link YouTube và Google Drive. Video sẽ được nhúng trực tiếp vào bài học.</div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button class="btn btn-brand px-4 py-2"><i class="bi bi-save me-2"></i>Lưu bài học</button>
+                                <a th:if="${roadmap != null}" th:href="@{'/teacher/roadmaps/' + ${roadmap.id} + '/edit'}" class="btn btn-outline-secondary px-3 py-2">Hủy</a>
+                                <a th:if="${lesson != null}" th:href="@{'/teacher/roadmaps/' + ${lesson.roadmapId} + '/edit'}" class="btn btn-outline-secondary px-3 py-2">Hủy</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="col-lg-7" th:if="${lesson != null}">
+                    <section class="panel mb-4">
+                        <div class="panel-body">
+                            <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-file-earmark-arrow-up-fill me-2 text-primary"></i>Thêm học liệu mới (Material)</h5>
+                            <form th:action="@{'/teacher/lessons/' + ${lesson.lessonId} + '/materials/create'}" th:object="${materialRequest}" method="post" enctype="multipart/form-data" class="row g-3">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                
+                                <div class="col-md-7">
+                                    <label class="form-label small fw-semibold">Tên học liệu</label>
+                                    <input class="form-control form-control-sm" th:field="*{title}" placeholder="Nhập tên tài liệu..." required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small fw-semibold">Loại học liệu</label>
+                                    <select class="form-select form-select-sm" th:field="*{type}" required>
+                                        <option value="">Chọn loại...</option>
+                                        <option th:each="type : ${materialTypes}" th:value="${type}" th:text="${type}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-semibold">Liên kết ngoài (External Link / Youtube)</label>
+                                    <input class="form-control form-control-sm" th:field="*{externalUrl}" placeholder="https://youtube.com/watch?v=...">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-semibold">Tệp tin đính kèm (Local File Upload)</label>
+                                    <input class="form-control form-control-sm" type="file" name="file">
+                                </div>
+                                <div class="col-12 text-end mt-3">
+                                    <button class="btn btn-brand btn-sm px-4"><i class="bi bi-plus"></i> Thêm tài liệu</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                    
+                    <section class="panel">
+                        <div class="panel-body p-0">
+                            <div class="p-3 border-bottom bg-white d-flex align-items-center">
+                                <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-file-earmark-text me-2 text-primary"></i>Danh sách học liệu của bài</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Học liệu</th>
+                                        <th>Loại</th>
+                                        <th>Hiển thị</th>
+                                        <th style="min-width: 180px;">Hành động</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="material : ${materials}">
+                                        <td>
+                                            <div class="fw-bold text-dark" th:text="${material.title}">Material Title</div>
+                                            <small class="text-muted text-truncate d-block" style="max-width: 250px;" th:text="${material.description}">Description</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border" th:text="${material.type}">PDF</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-status" 
+                                                  th:classappend="${material.published ? ' badge-active' : ' badge-pending'}"
+                                                  th:text="${material.published ? 'PUBLISHED' : 'DRAFT'}">DRAFT</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <a class="btn btn-sm btn-outline-primary" th:href="@{'/teacher/materials/' + ${material.id} + '/edit'}">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                
+                                                <form th:action="@{'/teacher/materials/' + ${material.id} + '/publish'}" method="post" style="display:inline;">
+                                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                    <button class="btn btn-sm" th:classappend="${material.published ? 'btn-outline-warning' : 'btn-outline-success'}">
+                                                        <span th:text="${material.published ? 'Ẩn' : 'Hiện'}">Publish</span>
+                                                    </button>
+                                                </form>
+                                                
+                                                <form th:action="@{'/teacher/materials/' + ${material.id} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa học liệu này?');">
+                                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(materials)}">
+                                        <td colspan="4" class="text-center py-4 text-muted">Chưa có học liệu nào được tải lên cho bài học này.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

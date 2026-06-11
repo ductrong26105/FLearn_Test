@@ -1,0 +1,94 @@
+<aside th:fragment="sidebar(activePage)" class="sidebar-wrapper" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <div class="sidebar-brand">
+        <div class="sidebar-logo">FL</div>
+        <span class="sidebar-logo-text">FLEARN</span>
+    </div>
+    
+    <ul class="sidebar-menu flex-grow-1">
+        <!-- ADMIN MENU -->
+        <li sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/dashboard" class="sidebar-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
+                <i class="bi bi-grid-fill"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/courses" class="sidebar-link" th:classappend="${activePage == 'courses' ? 'active' : ''}">
+                <i class="bi bi-book-half"></i>
+                <span>Khóa học</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/classes" class="sidebar-link" th:classappend="${activePage == 'classes' ? 'active' : ''}">
+                <i class="bi bi-journal-text"></i>
+                <span>Lớp học</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/lecturers" class="sidebar-link" th:classappend="${activePage == 'lecturers' ? 'active' : ''}">
+                <i class="bi bi-person-badge-fill"></i>
+                <span>Giảng viên</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/students" class="sidebar-link" th:classappend="${activePage == 'students' ? 'active' : ''}">
+                <i class="bi bi-people-fill"></i>
+                <span>Sinh viên</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/statistics" class="sidebar-link" th:classappend="${activePage == 'statistics' ? 'active' : ''}">
+                <i class="bi bi-bar-chart-line-fill"></i>
+                <span>Thống kê</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a href="/admin/system/settings" class="sidebar-link" th:classappend="${activePage == 'settings' ? 'active' : ''}">
+                <i class="bi bi-gear-fill"></i>
+                <span>Cài đặt hệ thống</span>
+            </a>
+        </li>
+
+        <!-- TEACHER MENU -->
+        <li sec:authorize="hasRole('TEACHER')">
+            <a href="/teacher/classes" class="sidebar-link" th:classappend="${activePage == 'classes' ? 'active' : ''}">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>Lớp học của tôi</span>
+            </a>
+        </li>
+
+        <!-- STUDENT MENU -->
+        <li sec:authorize="hasRole('STUDENT')">
+            <a href="/student/classes" class="sidebar-link" th:classappend="${activePage == 'classes' ? 'active' : ''}">
+                <i class="bi bi-mortarboard-fill"></i>
+                <span>Lớp học</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('STUDENT')">
+            <a href="/student/learning-history" class="sidebar-link" th:classappend="${activePage == 'history' ? 'active' : ''}">
+                <i class="bi bi-clock-history"></i>
+                <span>Lịch sử học</span>
+            </a>
+        </li>
+        
+        <!-- COMMON MENU -->
+        <li class="mt-auto">
+            <hr class="dropdown-divider bg-secondary opacity-25 my-3 mx-2">
+        </li>
+        <li>
+            <a href="/change-password" class="sidebar-link" th:classappend="${activePage == 'password' ? 'active' : ''}">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span>Đổi mật khẩu</span>
+            </a>
+        </li>
+        <li>
+            <form th:action="@{/logout}" method="post" id="logoutFormSidebar" class="d-none">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            </form>
+            <a href="javascript:void(0);" onclick="document.getElementById('logoutFormSidebar').submit();" class="sidebar-link text-danger">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Đăng xuất</span>
+            </a>
+        </li>
+    </ul>
+</aside>

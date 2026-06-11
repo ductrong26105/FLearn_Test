@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Lịch sử tự học')}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('history')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="breadcrumb-wrapper">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/student/classes">Lớp học</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Lịch sử tự học</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="page-title text-dark">Lịch sử tự học</h1>
+                    <p class="page-subtitle">Danh sách tất cả các tài liệu, video, liên kết bạn đã đánh dấu hoàn thành học tập.</p>
+                </div>
+            </div>
+            
+            <section class="panel">
+                <div class="panel-body p-0">
+                    <div class="p-3 border-bottom bg-white d-flex align-items-center">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history me-2 text-primary"></i>Học liệu đã tự học</h5>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th>Học liệu</th>
+                                <th>Loại</th>
+                                <th>Thời gian xem</th>
+                                <th style="width: 140px;">Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${history}">
+                                <td>
+                                    <div class="fw-bold text-dark" th:text="${item.material.title}">Material Title</div>
+                                    <small class="text-muted text-truncate d-block" style="max-width: 350px;" th:text="${item.material.description}">Description</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border" th:text="${item.material.type}">PDF</span>
+                                </td>
+                                <td th:text="${#dates.format(item.viewedAt, 'dd/MM/yyyy HH:mm')}">date</td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-brand px-3 py-1" th:href="@{'/student/materials/' + ${item.material.id}}">
+                                        <i class="bi bi-eye"></i> Xem lại
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(history)}">
+                                <td colspan="4" class="text-center py-4 text-muted">Bạn chưa đánh dấu hoàn thành tài liệu học tập nào.</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>
