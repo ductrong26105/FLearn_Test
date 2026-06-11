@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Tạo Khóa học')}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('courses')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="page-header mb-4">
+                <a href="/admin/courses" class="btn btn-outline-secondary btn-sm mb-3"><i class="bi bi-arrow-left"></i> Quay lại</a>
+                <h1 class="page-title text-dark">Thêm Khóa học mới</h1>
+                <p class="page-subtitle">Tạo chương trình giảng dạy chung trước khi thiết lập các lớp học chi tiết.</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <section class="panel">
+                        <div class="panel-body">
+                            <form th:action="@{/admin/courses/create}" th:object="${courseRequest}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                
+                                <div class="mb-3">
+                                    <label for="courseCode" class="form-label fw-semibold">Mã khóa học <span class="text-danger">*</span></label>
+                                    <input type="text" id="courseCode" th:field="*{courseCode}" class="form-control" placeholder="Ví dụ: MAD101, PRO192" required>
+                                    <div class="form-text text-danger" th:if="${#fields.hasErrors('courseCode')}" th:errors="*{courseCode}"></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="courseName" class="form-label fw-semibold">Tên khóa học <span class="text-danger">*</span></label>
+                                    <input type="text" id="courseName" th:field="*{courseName}" class="form-control" placeholder="Ví dụ: Discrete Mathematics, Java OOP" required>
+                                    <div class="form-text text-danger" th:if="${#fields.hasErrors('courseName')}" th:errors="*{courseName}"></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label fw-semibold">Mô tả khóa học</label>
+                                    <textarea id="description" th:field="*{description}" class="form-control" rows="4" placeholder="Nhập tóm tắt mô tả về khóa học..."></textarea>
+                                    <div class="form-text text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="status" class="form-label fw-semibold">Trạng thái ban đầu</label>
+                                    <select id="status" th:field="*{status}" class="form-select">
+                                        <option value="ACTIVE">Hoạt động (ACTIVE)</option>
+                                        <option value="INACTIVE">Ngưng hoạt động (INACTIVE)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-brand px-4">Tạo mới</button>
+                                    <a href="/admin/courses" class="btn btn-outline-secondary px-3">Hủy</a>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

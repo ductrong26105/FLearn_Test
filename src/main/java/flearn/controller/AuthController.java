@@ -1,55 +1,49 @@
 package flearn.controller;
 
+import flearn.dto.request.RegisterStudentRequest;
 import flearn.service.AuthService;
+import flearn.validation.ValidationMessage;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
 public class AuthController {
-
     private final AuthService authService;
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "auth/login";
     }
 
     @GetMapping("/register")
     public String register() {
-        return "register";
+        return "auth/register";
     }
 
-    // Cập nhật hàm này để hiện thông báo thay vì chuyển trang luôn
     @PostMapping("/register")
-    public String processRegister(@RequestParam String username,
-                                  @RequestParam String password,
-                                  @RequestParam String fullName,
-                                  @RequestParam String email,
-                                  Model model) {
-        try {
-            authService.registerStudent(username, password, fullName, email);
-            model.addAttribute("successMsg", "Đăng ký thành công! Vui lòng kiểm tra hộp thư Email để kích hoạt tài khoản.");
-        } catch (RuntimeException e) {
-            model.addAttribute("errorMsg", e.getMessage());
+    public String processRegister(@Valid @ModelAttribute RegisterStudentRequest request,
+                                  BindingResult bindingResult,
+                                  Model model,
+                                  RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("errorMsg", ValidationMessage.firstError(bindingResult));
+            return "auth/register";
         }
-        return "register"; // Ở lại trang đăng ký để người dùng đọc được thông báo
-    }
-
-    // Thêm hàm này để xử lý khi người dùng click link trong Email
-    @GetMapping("/verify-account")
-    public String verifyAccount(@RequestParam String token, Model model) {
         try {
-            authService.verifyAccount(token);
-            model.addAttribute("successMsg", "Xác thực tài khoản thành công! Bạn đã có thể đăng nhập.");
-            return "login"; // Thành công thì đá về trang đăng nhập
+            authService.registerStudent(request);
+            redirectAttributes.addFlashAttribute("successMsg", "Đăng ký thành công. Bạn có thể đăng nhập ngay.");
+            return "redirect:/login";
         } catch (RuntimeException e) {
             model.addAttribute("errorMsg", e.getMessage());
-            return "login";
+            return "auth/register";
         }
     }
 }

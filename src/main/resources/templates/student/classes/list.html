@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Lớp học của tôi')}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('classes')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="page-title text-dark">Lớp học của tôi</h1>
+                    <p class="page-subtitle">Xem tài liệu và nội dung tự học (pre-class) các lớp bạn đã tham gia.</p>
+                </div>
+                <a class="btn btn-brand" href="/student/classes/join">
+                    <i class="bi bi-door-open-fill me-2"></i>Tham gia lớp học
+                </a>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-xl-4" th:each="enrollment : ${enrollments}">
+                    <article class="class-card d-flex flex-column">
+                        <div class="card-body p-4 flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                    <div>
+                                        <h2 class="h5 fw-bold mb-1 text-dark text-truncate" style="max-width: 200px;" th:text="${enrollment.classRoom.className}">Class</h2>
+                                        <div class="text-muted small">Mã lớp: <strong class="text-secondary" th:text="${enrollment.classRoom.classCode}">CODE</strong></div>
+                                    </div>
+                                    <span class="badge bg-success px-2 py-1 rounded text-uppercase" style="font-size: 0.7rem; font-weight: 700;">Đã tham gia</span>
+                                </div>
+                                <p class="mb-3 text-dark small">
+                                    <i class="bi bi-person-workspace text-primary me-2"></i>Giảng viên: 
+                                    <strong th:text="${enrollment.classRoom.teacher != null ? enrollment.classRoom.teacher.fullName : 'Chưa gán'}">Teacher</strong>
+                                </p>
+                                <p class="text-muted small mb-4" style="height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;" th:text="${enrollment.classRoom.description != null and !#strings.isEmpty(enrollment.classRoom.description) ? enrollment.classRoom.description : 'Chưa có mô tả chi tiết cho lớp học này.'}">Description</p>
+                            </div>
+                            
+                            <div class="pt-3 border-top text-end">
+                                <a class="btn btn-brand w-100 py-2" th:href="@{'/student/classes/' + ${enrollment.classRoom.classId} + '/learning'}">
+                                    <i class="bi bi-book-half me-2"></i>Xem học liệu
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(enrollments)}" class="col-12">
+                    <div class="empty-state text-muted text-center py-4">Bạn chưa tham gia lớp học hoạt động nào. Hãy nhập mã lớp học để gửi yêu cầu tham gia!</div>
+                </div>
+            </div>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Tham gia lớp học')}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('classes')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4" style="max-width: 800px;">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="breadcrumb-wrapper">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/student/classes">Lớp học</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Tham gia lớp</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="page-title text-dark">Tham gia lớp học</h1>
+                    <p class="page-subtitle">Nhập mã lớp học gồm 6 ký tự do giảng viên hoặc admin cung cấp.</p>
+                </div>
+            </div>
+            
+            <form th:action="@{/student/classes/join}" th:object="${joinClassRequest}" method="post" class="panel">
+                <div class="panel-body">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Mã lớp học (Invite Code)</label>
+                        <input class="form-control text-uppercase fw-bold" th:field="*{inviteCode}" maxlength="6" placeholder="Ví dụ: ABCXYZ" style="letter-spacing: 2px; font-size: 1.2rem;" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark">Lời nhắn gửi giảng viên</label>
+                        <textarea class="form-control" th:field="*{requestMessage}" rows="4" placeholder="Giới thiệu bản thân hoặc lý do đăng ký học lớp này..."></textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-brand px-4 py-2"><i class="bi bi-send-fill me-2"></i>Gửi yêu cầu tham gia</button>
+                        <a href="/student/classes" class="btn btn-outline-secondary px-4 py-2">Quay lại</a>
+                    </div>
+                </div>
+            </form>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

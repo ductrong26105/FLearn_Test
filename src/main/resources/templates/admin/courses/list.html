@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Quản lý Khóa học')}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('courses')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="page-title text-dark">Quản lý Khóa học</h1>
+                    <p class="page-subtitle">Xem, thêm mới, sửa đổi thông tin khóa học trong hệ thống.</p>
+                </div>
+                <div>
+                    <a class="btn btn-brand" href="/admin/courses/create"><i class="bi bi-plus-circle me-2"></i>Thêm Khóa học</a>
+                </div>
+            </div>
+            
+            <section class="panel">
+                <div class="panel-body">
+                    <form th:action="@{/admin/courses}" method="get" class="row g-3 mb-4 align-items-center">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" name="keyword" th:value="${keyword}" class="form-control border-start-0" placeholder="Tìm theo mã, tên khóa học...">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <button type="submit" class="btn btn-brand px-4">Tìm kiếm</button>
+                            <a th:href="@{/admin/courses}" class="btn btn-outline-secondary px-3 ms-2">Reset</a>
+                        </div>
+                    </form>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th>Mã khóa học</th>
+                                <th>Tên khóa học</th>
+                                <th>Mô tả</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="course : ${courses}">
+                                <td><span class="badge bg-secondary px-2 py-1" th:text="${course.courseCode}">CODE</span></td>
+                                <td>
+                                    <a th:href="@{'/admin/courses/' + ${course.id}}" class="fw-semibold text-dark text-decoration-none" th:text="${course.courseName}">Name</a>
+                                </td>
+                                <td>
+                                    <small class="text-muted text-truncate d-block" style="max-width: 300px;" th:text="${course.description}">Description</small>
+                                </td>
+                                <td>
+                                    <span class="badge-status"
+                                          th:classappend="${course.status == 'ACTIVE' ? ' badge-active' : ' badge-inactive'}"
+                                          th:text="${course.status}">ACTIVE</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a th:href="@{'/admin/courses/' + ${course.id} + '/edit'}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil-square"></i> Sửa</a>
+                                        <form th:action="@{'/admin/courses/' + ${course.id} + '/toggle'}" method="post" class="d-inline">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                            <button type="submit" class="btn btn-sm" th:classappend="${course.status == 'ACTIVE' ? 'btn-outline-warning' : 'btn-outline-success'}">
+                                                <i class="bi" th:classappend="${course.status == 'ACTIVE' ? 'bi-lock-fill' : 'bi-unlock-fill'}"></i> Toggle
+                                            </button>
+                                        </form>
+                                        <form th:action="@{'/admin/courses/' + ${course.id} + '/delete'}" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khóa học này không?');">
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash-fill"></i> Xóa</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(courses)}">
+                                <td colspan="5">
+                                    <div class="empty-state text-muted text-center py-4">Không tìm thấy khóa học nào.</div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

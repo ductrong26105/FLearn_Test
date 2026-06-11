@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Cài đặt hệ thống')}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('settings')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4" style="max-width: 800px;">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="page-title text-dark">Cài đặt hệ thống</h1>
+                    <p class="page-subtitle">Quản lý các thông số hoạt động của toàn bộ hệ thống.</p>
+                </div>
+            </div>
+            
+            <section class="panel">
+                <div class="panel-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <h5 class="fw-bold mb-1 text-dark"><i class="bi bi-tools text-primary me-2"></i>Chế độ Bảo trì (Maintenance Mode)</h5>
+                            <p class="text-muted mb-0 small">Khi bật, Student và Teacher sẽ bị chuyển hướng đến trang bảo trì.</p>
+                        </div>
+                        <div>
+                            <span class="badge-status" 
+                                  th:classappend="${maintenanceMode ? ' badge-blocked' : ' badge-active'}" 
+                                  th:text="${maintenanceMode ? 'ĐANG BẬT (ON)' : 'ĐANG TẮT (OFF)'}">OFF</span>
+                        </div>
+                    </div>
+                    
+                    <form th:action="@{/admin/system/settings/maintenance}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        
+                        <div class="form-check form-switch mb-4 p-3 bg-light rounded border">
+                            <input class="form-check-input ms-0 me-3" type="checkbox" name="enabled" value="true" id="maintenanceMode" th:checked="${maintenanceMode}" style="cursor: pointer; width: 2.8em; height: 1.4em;">
+                            <label class="form-check-label fw-bold text-dark" for="maintenanceMode" style="cursor: pointer; line-height: 1.4em;">
+                                Kích hoạt chế độ bảo trì hệ thống
+                            </label>
+                        </div>
+                        
+                        <button class="btn btn-brand px-4 py-2"><i class="bi bi-save me-2"></i>Lưu cấu hình</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

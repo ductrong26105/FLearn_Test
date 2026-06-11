@@ -21,4 +21,14 @@ public class HomeController {
 
         return "redirect:/student/dashboard";
     }
+
+    @GetMapping("/maintenance")
+    public String maintenance() {
+        return "error/maintenance";
+    }
+
+    @GetMapping("/access-denied")
+    public String accessDenied() {
+        return "error/access-denied";
+    }
 }

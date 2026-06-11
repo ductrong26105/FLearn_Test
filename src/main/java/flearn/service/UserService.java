@@ -1,45 +1,29 @@
 package flearn.service;
 
-import flearn.entity.User;
-import flearn.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import flearn.dto.request.CreateTeacherRequest;
+import flearn.dto.request.UpdateUserRequest;
+import flearn.dto.response.UserResponse;
+import flearn.enums.Role;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+public interface UserService {
+    List<UserResponse> getAllUsers();
 
-    // Lấy toàn bộ danh sách user cho Admin
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+    List<UserResponse> getUsersByRole(Role role);
 
-    // Admin tạo tài khoản cho Giáo viên
-    public void createTeacher(String username, String password, String fullName, String email) {
-        if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Tên đăng nhập hoặc Email đã tồn tại!");
-        }
-        User teacher = User.builder()
-                .username(username)
-                .passwordHash(passwordEncoder.encode(password))
-                .fullName(fullName)
-                .email(email)
-                .role(1) // 1 là Role Giáo viên
-                .isActive(true)
-                .build();
-        userRepository.save(teacher);
-    }
+    List<UserResponse> searchUsersByRole(Role role, String keyword);
 
-    // Khóa / Mở khóa tài khoản
-    public void toggleUserStatus(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
-        user.setIsActive(!user.getIsActive()); // Đảo ngược trạng thái
-        userRepository.save(user);
-    }
+    UserResponse getUserById(Integer userId);
+
+    void createTeacher(@Valid CreateTeacherRequest request);
+
+    void updateUser(Integer userId, @Valid UpdateUserRequest request);
+
+    void toggleUserStatus(Integer userId);
+
+    void blockUser(Integer userId);
+
+    void unblockUser(Integer userId);
 }

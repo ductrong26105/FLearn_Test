@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Chi tiết Khóa học')}"></head>
+<body class="bg-light">
+<div class="app-container">
+    <div th:replace="~{fragments/sidebar :: sidebar('courses')}"></div>
+    <div class="flex-grow-1 d-flex flex-column" style="min-width: 0;">
+        <div th:replace="~{fragments/topbar :: topbar}"></div>
+        
+        <main class="app-shell flex-grow-1 p-4">
+            <div th:replace="~{fragments/alerts :: alerts}"></div>
+            
+            <div class="page-header mb-4">
+                <a href="/admin/courses" class="btn btn-outline-secondary btn-sm mb-3"><i class="bi bi-arrow-left"></i> Quay lại</a>
+                <h1 class="page-title text-dark">Chi tiết Khóa học: <span th:text="${course.courseName}">Discrete Math</span></h1>
+                <p class="page-subtitle">Xem thông tin chi tiết và danh sách lớp học liên kết.</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-12 col-md-4">
+                    <section class="panel mb-4">
+                        <div class="panel-body">
+                            <h5 class="fw-bold mb-3 border-bottom pb-2">Thông tin chung</h5>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Mã khóa học</small>
+                                <span class="badge bg-secondary px-2 py-1 fs-6" th:text="${course.courseCode}">MAD101</span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Tên khóa học</small>
+                                <strong class="text-dark" th:text="${course.courseName}">Discrete Mathematics</strong>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Mô tả</small>
+                                <span class="text-dark" th:text="${course.description != null and !course.description.isEmpty() ? course.description : 'Không có mô tả.'}">Description</span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Trạng thái hoạt động</small>
+                                <span class="badge-status text-uppercase"
+                                      th:classappend="${course.status == 'ACTIVE' ? ' badge-active' : ' badge-inactive'}"
+                                      th:text="${course.status}">ACTIVE</span>
+                            </div>
+                            <div>
+                                <a th:href="@{'/admin/courses/' + ${course.id} + '/edit'}" class="btn btn-brand w-100"><i class="bi bi-pencil-square me-2"></i> Chỉnh sửa</a>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <div class="col-12 col-md-8">
+                    <section class="panel">
+                        <div class="panel-body">
+                            <h5 class="fw-bold mb-3 border-bottom pb-2">Danh sách lớp học trực thuộc</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th>Mã lớp</th>
+                                        <th>Tên lớp</th>
+                                        <th>Giảng viên phụ trách</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="classroom : ${classes}">
+                                        <td><span class="badge bg-light text-dark border" th:text="${classroom.classCode}">CODE</span></td>
+                                        <td>
+                                            <a th:href="@{'/admin/classes/' + ${classroom.classId}}" class="fw-semibold text-dark text-decoration-none" th:text="${classroom.className}">Class</a>
+                                        </td>
+                                        <td>
+                                            <span th:if="${classroom.teacher != null}" class="text-primary fw-semibold">
+                                                <i class="bi bi-person-circle me-1"></i>[[${classroom.teacher.fullName}]]
+                                            </span>
+                                            <span th:if="${classroom.teacher == null}" class="text-muted font-italic">Chưa gán</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge-status"
+                                                  th:classappend="${classroom.status == 'ACTIVE' ? ' badge-active' : (classroom.status == 'CLOSED' ? ' badge-closed' : ' badge-inactive')}"
+                                                  th:text="${classroom.status}">ACTIVE</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(classes)}">
+                                        <td colspan="4" class="text-center py-4 text-muted">Chưa có lớp học nào liên kết với khóa học này.</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+        
+        <footer th:replace="~{fragments/footer :: footer}"></footer>
+    </div>
+</div>
+<div th:replace="~{fragments/scripts :: scripts}"></div>
+</body>
+</html>

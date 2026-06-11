@@ -1,5 +1,6 @@
 package flearn.entity;
 
+import flearn.enums.QuizSubmissionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Date;
@@ -22,12 +23,57 @@ public class QuizResult {
     private Quiz quiz;
 
     @Column(name = "[Score]", nullable = false)
-    private Double score;
+    @Builder.Default
+    private Double score = 0.0;
+
+    @Column(name = "[CorrectCount]")
+    @Builder.Default
+    private Integer correctCount = 0;
+
+    @Column(name = "[TotalQuestions]")
+    @Builder.Default
+    private Integer totalQuestions = 0;
+
+    @Column(name = "[AttemptNo]")
+    @Builder.Default
+    private Integer attemptNo = 1;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "[Status]", length = 20, nullable = false)
+    @Builder.Default
+    private QuizSubmissionStatus status = QuizSubmissionStatus.IN_PROGRESS;
+
+    @Column(name = "[StartedAt]")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startedAt;
+
+    @Column(name = "[SubmittedAt]")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date submittedAt;
 
     @Column(name = "[CompletedAt]")
     @Temporal(TemporalType.TIMESTAMP)
     private Date completedAt;
 
     @PrePersist
-    protected void onCreate() { completedAt = new Date(); }
+    protected void onCreate() {
+        if (startedAt == null) {
+            startedAt = new Date();
+        }
+        if (score == null) {
+            score = 0.0;
+        }
+        if (correctCount == null) {
+            correctCount = 0;
+        }
+        if (totalQuestions == null) {
+            totalQuestions = 0;
+        }
+        if (attemptNo == null) {
+            attemptNo = 1;
+        }
+        if (status == null) {
+            status = QuizSubmissionStatus.IN_PROGRESS;
+        }
+    }
 }

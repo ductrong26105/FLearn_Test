@@ -1,0 +1,17 @@
+<header th:fragment="topbar" class="topbar-wrapper" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <div class="topbar-title-wrapper">
+        <h5 class="m-0 fw-bold brand-text d-lg-block">FLearn Active Learning</h5>
+    </div>
+    
+    <div class="topbar-user" sec:authorize="isAuthenticated()">
+        <div class="text-end d-none d-md-block">
+            <div class="topbar-user-name" sec:authentication="principal.user.fullName">Full Name</div>
+            <span class="topbar-user-role" sec:authorize="hasRole('ADMIN')">Admin</span>
+            <span class="topbar-user-role" sec:authorize="hasRole('TEACHER')">Giảng viên</span>
+            <span class="topbar-user-role" sec:authorize="hasRole('STUDENT')">Sinh viên</span>
+        </div>
+        <div class="topbar-user-avatar">
+            <i class="bi bi-person-fill"></i>
+        </div>
+    </div>
+</header>
