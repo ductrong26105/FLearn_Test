@@ -5,136 +5,696 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${pageTitle + ' - FLearn'}">Quiz - FLearn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link th:href="@{/css/app.css}" rel="stylesheet">
+    <style>
+        /* ── Page-level reset ── */
+        body { font-family: 'Inter', sans-serif; background: #f6f7fb; }
+
+        /* ── Hero header ── */
+        .quiz-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1a1f3a 100%);
+            border-radius: 16px;
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .quiz-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(242,107,33,.22) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .quiz-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: 30%;
+            width: 160px; height: 160px;
+            background: radial-gradient(circle, rgba(99,102,241,.14) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .quiz-hero-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,.55);
+            font-size: .82rem;
+            font-weight: 600;
+            text-decoration: none;
+            letter-spacing: .3px;
+            margin-bottom: 16px;
+            transition: color .2s;
+        }
+        .quiz-hero-back:hover { color: rgba(255,255,255,.9); }
+        .quiz-hero-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 6px;
+            position: relative; z-index: 1;
+        }
+        .quiz-hero-sub {
+            color: rgba(255,255,255,.5);
+            font-size: .9rem;
+            margin: 0;
+            position: relative; z-index: 1;
+        }
+        .quiz-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(242,107,33,.18);
+            color: #fb923c;
+            border: 1px solid rgba(242,107,33,.28);
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+            margin-bottom: 14px;
+            position: relative; z-index: 1;
+        }
+
+        /* ── Alert toast style ── */
+        .quiz-alert {
+            border-radius: 12px;
+            border: 0;
+            padding: 14px 20px;
+            font-weight: 600;
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .quiz-alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        .quiz-alert-danger {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* ── Section card ── */
+        .quiz-section {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(15,23,42,.05);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: box-shadow .2s;
+        }
+        .quiz-section:hover { box-shadow: 0 8px 32px rgba(15,23,42,.09); }
+        .quiz-section-header {
+            padding: 18px 24px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .quiz-section-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .icon-orange  { background: rgba(242,107,33,.1);  color: #f26b21; }
+        .icon-violet  { background: rgba(99,102,241,.1);  color: #6366f1; }
+        .icon-teal    { background: rgba(20,184,166,.1);  color: #14b8a6; }
+        .icon-sky     { background: rgba(14,165,233,.1);  color: #0ea5e9; }
+
+        .quiz-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+        .quiz-section-body { padding: 18px 24px 24px; }
+
+        /* ── Form inputs ── */
+        .quiz-label {
+            font-size: .78rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .quiz-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: .95rem;
+            color: #0f172a;
+            background: #f8fafc;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-input:focus {
+            border-color: #f26b21;
+            box-shadow: 0 0 0 3px rgba(242,107,33,.12);
+            background: #fff;
+        }
+        textarea.quiz-input { resize: vertical; min-height: 90px; }
+        .quiz-input-group {
+            position: relative;
+        }
+        .quiz-input-group .quiz-input { padding-left: 42px; }
+        .quiz-input-group .input-icon {
+            position: absolute;
+            left: 14px; top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        /* ── Toggle switch ── */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border: 1.5px solid #f1f5f9;
+            border-radius: 12px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            gap: 12px;
+        }
+        .toggle-row:hover { border-color: #e2e8f0; background: #f1f5f9; }
+        .toggle-info { display: flex; align-items: center; gap: 12px; }
+        .toggle-info i { font-size: 1.1rem; color: #94a3b8; }
+        .toggle-text { font-weight: 600; color: #1e293b; font-size: .9rem; }
+        .toggle-sub  { font-size: .75rem; color: #94a3b8; }
+
+        /* Bootstrap form-switch override - brand orange */
+        .quiz-toggle-input {
+            width: 3em !important;
+            height: 1.6em !important;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .quiz-toggle-input:checked {
+            background-color: #f26b21 !important;
+            border-color: #f26b21 !important;
+        }
+        .quiz-toggle-input:focus {
+            box-shadow: 0 0 0 3px rgba(242,107,33,.2) !important;
+            border-color: #f26b21 !important;
+        }
+        .toggle-row:has(.quiz-toggle-input:checked) {
+            border-color: rgba(242,107,33,.35);
+            background: rgba(242,107,33,.04);
+        }
+
+
+        /* ── Action bar ── */
+        .quiz-actions {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(15,23,42,.05);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn-quiz-save {
+            background: linear-gradient(135deg, #f26b21, #e05a12);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 28px;
+            font-weight: 700;
+            font-size: .95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .2s;
+            box-shadow: 0 4px 12px rgba(242,107,33,.3);
+            cursor: pointer;
+        }
+        .btn-quiz-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(242,107,33,.4);
+        }
+        .btn-quiz-publish {
+            border: 1.5px solid #6366f1;
+            color: #6366f1;
+            background: rgba(99,102,241,.05);
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-weight: 700;
+            font-size: .9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all .2s;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-quiz-publish:hover {
+            background: rgba(99,102,241,.1);
+            color: #4f46e5;
+        }
+        .btn-quiz-results {
+            border: 1.5px solid #e2e8f0;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-weight: 600;
+            font-size: .9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all .2s;
+            text-decoration: none;
+        }
+        .btn-quiz-results:hover { background: #f1f5f9; color: #334155; }
+        .btn-quiz-danger {
+            border: 1.5px solid #fca5a5;
+            color: #dc2626;
+            background: #fef2f2;
+            border-radius: 10px;
+            padding: 10px 22px;
+            font-weight: 600;
+            font-size: .9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all .2s;
+            cursor: pointer;
+        }
+        .btn-quiz-danger:hover { background: #fee2e2; }
+        .actions-spacer { flex: 1; }
+
+        /* Publish pill badge */
+        .publish-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .4px;
+        }
+        .pill-published { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .pill-draft     { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+
+        /* ── Question section ── */
+        .question-card {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            background: #f8fafc;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: border-color .2s, background .2s;
+        }
+        .question-card:hover { border-color: #cbd5e1; background: #fff; }
+        .question-num {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            background: #f26b21;
+            color: #fff;
+            font-weight: 800;
+            font-size: .8rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .question-body { flex: 1; min-width: 0; }
+        .question-text { font-weight: 600; color: #0f172a; font-size: .95rem; margin-bottom: 4px; }
+        .question-meta { font-size: .78rem; color: #64748b; }
+        .question-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .btn-q-edit, .btn-q-del {
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: .8rem;
+            font-weight: 600;
+            border: 1.5px solid;
+            cursor: pointer;
+            transition: all .15s;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .btn-q-edit { border-color: #bfdbfe; color: #1d4ed8; background: #eff6ff; }
+        .btn-q-edit:hover { background: #dbeafe; color: #1e40af; }
+        .btn-q-del  { border-color: #fecaca; color: #dc2626; background: #fef2f2; }
+        .btn-q-del:hover  { background: #fee2e2; }
+
+        /* Add question form */
+        .add-question-form {
+            border: 2px dashed #e2e8f0;
+            border-radius: 14px;
+            padding: 22px 24px;
+            background: #f8fafc;
+        }
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media(max-width:576px) { .option-grid { grid-template-columns: 1fr; } }
+
+        .empty-questions {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+        .empty-questions i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+        .empty-questions p { margin: 0; font-weight: 500; }
+    </style>
 </head>
 <body>
 <main class="app-shell">
-    <a th:if="${quiz != null}" class="btn btn-outline-secondary mb-3"
-       th:href="@{/teacher/lessons/{id}/quizzes(id=${quiz.lessonId})}">Quay lại</a>
-    <a th:if="${lesson != null}" class="btn btn-outline-secondary mb-3"
-       th:href="@{/teacher/lessons/{id}/quizzes(id=${lesson.lessonId})}">Quay lại</a>
 
-    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
-    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
-
-    <div class="page-header">
-        <h1 class="page-title" th:text="${pageTitle}">Cấu hình quiz</h1>
-        <p class="page-subtitle">Thiết lập publish, deadline, thời gian làm bài và số lần làm.</p>
+    <!-- ── Alert messages ── -->
+    <div th:if="${successMsg}" class="quiz-alert quiz-alert-success">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMsg}"></span>
+    </div>
+    <div th:if="${errorMsg}" class="quiz-alert quiz-alert-danger">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMsg}"></span>
     </div>
 
-    <form class="panel mb-4" th:action="@{${formAction}}" th:object="${quizRequest}" method="post">
-        <div class="panel-body row g-3">
-            <div class="col-md-8">
-                <label class="form-label">Tên quiz</label>
-                <input class="form-control" th:field="*{title}" required maxlength="200">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Số lần làm</label>
-                <input class="form-control" type="number" min="1" max="50" th:field="*{maxAttempts}">
-            </div>
-            <div class="col-12">
-                <label class="form-label">Mô tả</label>
-                <textarea class="form-control" rows="3" th:field="*{description}"></textarea>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Thời gian làm bài (phút)</label>
-                <input class="form-control" type="number" min="1" max="600" th:field="*{timeLimitMinutes}">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Deadline</label>
-                <input class="form-control" type="datetime-local" name="deadline"
-                       th:value="${quizRequest.deadline != null ? #dates.format(quizRequest.deadline, 'yyyy-MM-dd''T''HH:mm') : ''}">
-            </div>
-            <div class="col-md-4 d-flex align-items-end gap-4">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" th:field="*{shuffleQuestions}">
-                    <label class="form-check-label">Đảo câu hỏi</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" th:field="*{shuffleAnswers}">
-                    <label class="form-check-label">Đảo đáp án</label>
-                </div>
-            </div>
-            <div class="col-12 d-flex gap-2">
-                <button class="btn btn-brand px-4" type="submit">Lưu cấu hình</button>
-            </div>
-        </div>
-    </form>
+    <!-- ── Hero header ── -->
+    <div class="quiz-hero">
+        <a th:if="${quiz != null}"
+           th:href="@{/teacher/lessons/{id}/quizzes(id=${quiz.lessonId})}"
+           class="quiz-hero-back">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        </a>
+        <a th:if="${lesson != null}"
+           th:href="@{/teacher/lessons/{id}/quizzes(id=${lesson.lessonId})}"
+           class="quiz-hero-back">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        </a>
 
-    <div th:if="${quiz != null}">
-        <div class="d-flex gap-2 mb-4">
-            <form th:action="@{/teacher/quizzes/{id}/publish(id=${quiz.quizId})}" method="post">
-                <button class="btn btn-outline-primary" type="submit" th:text="${quiz.published ? 'Unpublish' : 'Publish'}">Publish</button>
-            </form>
-            <a class="btn btn-outline-secondary" th:href="@{/teacher/quizzes/{id}/results(id=${quiz.quizId})}">Xem kết quả</a>
-            <form th:action="@{/teacher/quizzes/{id}/delete(id=${quiz.quizId})}" method="post" onsubmit="return confirm('Xóa quiz này và toàn bộ kết quả?');">
-                <button class="btn btn-outline-danger" type="submit">Xóa quiz</button>
-            </form>
+        <div class="quiz-hero-badge">
+            <i class="bi bi-lightning-charge-fill"></i>
+            <span th:text="${quiz != null ? 'Chỉnh sửa Quiz' : 'Tạo mới'}">Tạo mới</span>
         </div>
 
-        <section class="panel mb-4">
-            <div class="panel-body">
-                <h2 class="h5 fw-bold mb-3">Thêm câu hỏi</h2>
-                <form th:action="@{/teacher/quizzes/{id}/questions/create(id=${quiz.quizId})}" th:object="${questionRequest}" method="post" class="row g-3">
+        <h1 class="quiz-hero-title" th:text="${pageTitle}">Cấu hình quiz</h1>
+        <p class="quiz-hero-sub">Thiết lập tên, mô tả, thời gian làm bài, deadline và các tùy chọn nâng cao.</p>
+    </div>
+
+    <!-- ── Config form ── -->
+    <form th:action="@{${formAction}}" th:object="${quizRequest}" method="post" id="quizForm">
+
+        <!-- Section 1: Basic info -->
+        <div class="quiz-section">
+            <div class="quiz-section-header">
+                <div class="quiz-section-icon icon-orange"><i class="bi bi-pencil-square"></i></div>
+                <div>
+                    <p class="quiz-section-title">Thông tin cơ bản</p>
+                </div>
+            </div>
+            <div class="quiz-section-body">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="quiz-label">Tên quiz</label>
+                        <div class="quiz-input-group">
+                            <i class="bi bi-journal-text input-icon"></i>
+                            <input class="quiz-input" th:field="*{title}" required maxlength="200"
+                                   placeholder="Nhập tên quiz...">
+                        </div>
+                    </div>
                     <div class="col-md-4">
-                        <label class="form-label">Loại câu hỏi</label>
-                        <select class="form-select" th:field="*{type}">
-                            <option th:each="type : ${questionTypes}" th:value="${type}" th:text="${type}">TYPE</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label">Thứ tự</label>
-                        <input class="form-control" type="number" th:field="*{orderIndex}">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Đáp án đúng</label>
-                        <select class="form-select" th:field="*{correctAnswer}">
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                            <option value="D">D</option>
-                            <option value="TRUE">TRUE</option>
-                            <option value="FALSE">FALSE</option>
-                        </select>
+                        <label class="quiz-label">Số lần làm tối đa</label>
+                        <div class="quiz-input-group">
+                            <i class="bi bi-arrow-repeat input-icon"></i>
+                            <input class="quiz-input" type="number" min="1" max="50" th:field="*{maxAttempts}">
+                        </div>
                     </div>
                     <div class="col-12">
-                        <label class="form-label">Nội dung câu hỏi</label>
-                        <textarea class="form-control" rows="2" th:field="*{questionText}" required></textarea>
+                        <label class="quiz-label">Mô tả</label>
+                        <textarea class="quiz-input" rows="3" th:field="*{description}"
+                                  placeholder="Mô tả ngắn về quiz (tuỳ chọn)..."></textarea>
                     </div>
-                    <div class="col-md-6"><input class="form-control" th:field="*{optionA}" placeholder="Đáp án A"></div>
-                    <div class="col-md-6"><input class="form-control" th:field="*{optionB}" placeholder="Đáp án B"></div>
-                    <div class="col-md-6"><input class="form-control" th:field="*{optionC}" placeholder="Đáp án C"></div>
-                    <div class="col-md-6"><input class="form-control" th:field="*{optionD}" placeholder="Đáp án D"></div>
-                    <div class="col-12"><button class="btn btn-brand" type="submit">Thêm câu hỏi</button></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Time & deadline -->
+        <div class="quiz-section">
+            <div class="quiz-section-header">
+                <div class="quiz-section-icon icon-sky"><i class="bi bi-clock"></i></div>
+                <div>
+                    <p class="quiz-section-title">Thời gian &amp; Deadline</p>
+                </div>
+            </div>
+            <div class="quiz-section-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="quiz-label">Thời gian làm bài (phút)</label>
+                        <div class="quiz-input-group">
+                            <i class="bi bi-stopwatch input-icon"></i>
+                            <input class="quiz-input" type="number" min="1" max="600"
+                                   th:field="*{timeLimitMinutes}" placeholder="Không giới hạn nếu để trống">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="quiz-label">Deadline nộp bài</label>
+                        <div class="quiz-input-group">
+                            <i class="bi bi-calendar-event input-icon"></i>
+                            <input class="quiz-input" type="datetime-local" name="deadline"
+                                   th:value="${quizRequest.deadline != null ? #dates.format(quizRequest.deadline, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="quiz-label">
+                            <i class="bi bi-collection-play" style="color:#6366f1"></i>
+                            Mốc video gate (giây)
+                        </label>
+                        <div class="quiz-input-group">
+                            <i class="bi bi-pin-angle input-icon"></i>
+                            <input class="quiz-input" type="number" min="0" th:field="*{videoTimestamp}"
+                                   placeholder="VD: 120 = tại phút 2:00">
+                        </div>
+                        <div style="font-size:.75rem;color:#94a3b8;margin-top:5px;">
+                            <i class="bi bi-info-circle"></i>
+                            Để trống = không gate. Chỉ hoạt động với video YouTube.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Advanced options -->
+        <div class="quiz-section">
+            <div class="quiz-section-header">
+                <div class="quiz-section-icon icon-violet"><i class="bi bi-sliders"></i></div>
+                <div>
+                    <p class="quiz-section-title">Tùy chọn nâng cao</p>
+                </div>
+            </div>
+            <div class="quiz-section-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <i class="bi bi-shuffle"></i>
+                                <div>
+                                    <div class="toggle-text">Đảo thứ tự câu hỏi</div>
+                                    <div class="toggle-sub">Câu hỏi xuất hiện ngẫu nhiên mỗi lần thi</div>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input quiz-toggle-input" type="checkbox" role="switch"
+                                       id="shuffleQuestions" th:field="*{shuffleQuestions}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="toggle-row">
+                            <div class="toggle-info">
+                                <i class="bi bi-arrow-left-right"></i>
+                                <div>
+                                    <div class="toggle-text">Đảo thứ tự đáp án</div>
+                                    <div class="toggle-sub">Đáp án A/B/C/D xuất hiện ngẫu nhiên</div>
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input quiz-toggle-input" type="checkbox" role="switch"
+                                       id="shuffleAnswers" th:field="*{shuffleAnswers}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <!-- ── Action bar (outside main form to avoid nested form bug) ── -->
+    <div class="quiz-actions">
+        <!-- Save button links back to quizForm via form attribute -->
+        <button class="btn-quiz-save" type="submit" form="quizForm">
+            <i class="bi bi-floppy2-fill"></i> Lưu cấu hình
+        </button>
+
+        <th:block th:if="${quiz != null}">
+            <!-- Publish / Unpublish (standalone form) -->
+            <form th:action="@{/teacher/quizzes/{id}/publish(id=${quiz.quizId})}" method="post" style="margin:0">
+                <button class="btn-quiz-publish" type="submit">
+                    <i class="bi" th:classappend="${quiz.published ? 'bi-eye-slash' : 'bi-eye'}"></i>
+                    <span th:text="${quiz.published ? 'Unpublish' : 'Publish'}">Publish</span>
+                </button>
+            </form>
+
+            <a class="btn-quiz-results"
+               th:href="@{/teacher/quizzes/{id}/results(id=${quiz.quizId})}">
+                <i class="bi bi-bar-chart-line"></i> Xem kết quả
+            </a>
+
+            <div class="actions-spacer"></div>
+
+            <!-- Current status pill -->
+            <span class="publish-pill"
+                  th:classappend="${quiz.published ? 'pill-published' : 'pill-draft'}">
+                <i class="bi" th:classappend="${quiz.published ? 'bi-check-circle-fill' : 'bi-circle-half'}"></i>
+                <span th:text="${quiz.published ? 'PUBLISHED' : 'DRAFT'}">DRAFT</span>
+            </span>
+
+            <!-- Delete (standalone form) -->
+            <form th:action="@{/teacher/quizzes/{id}/delete(id=${quiz.quizId})}" method="post" style="margin:0"
+                  onsubmit="return confirm('Xóa quiz này và toàn bộ kết quả?');">
+                <button class="btn-quiz-danger" type="submit">
+                    <i class="bi bi-trash3"></i> Xóa quiz
+                </button>
+            </form>
+        </th:block>
+    </div>
+
+    <!-- ── Add question + question list (only when editing existing quiz) ── -->
+    <div th:if="${quiz != null}">
+
+        <!-- Add question -->
+        <div class="quiz-section">
+            <div class="quiz-section-header">
+                <div class="quiz-section-icon icon-teal"><i class="bi bi-plus-circle"></i></div>
+                <div><p class="quiz-section-title">Thêm câu hỏi mới</p></div>
+            </div>
+            <div class="quiz-section-body">
+                <form th:action="@{/teacher/quizzes/{id}/questions/create(id=${quiz.quizId})}"
+                      th:object="${questionRequest}" method="post">
+                    <div class="add-question-form">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-5">
+                                <label class="quiz-label">Loại câu hỏi</label>
+                                <select class="quiz-input" style="height:44px" th:field="*{type}">
+                                    <option th:each="type : ${questionTypes}"
+                                            th:value="${type}" th:text="${type}">TYPE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="quiz-label">Thứ tự</label>
+                                <input class="quiz-input" type="number" th:field="*{orderIndex}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="quiz-label">Đáp án đúng</label>
+                                <select class="quiz-input" style="height:44px" th:field="*{correctAnswer}">
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                    <option value="TRUE">TRUE</option>
+                                    <option value="FALSE">FALSE</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="quiz-label">Nội dung câu hỏi</label>
+                                <textarea class="quiz-input" rows="2" th:field="*{questionText}"
+                                          required placeholder="Nhập nội dung câu hỏi..."></textarea>
+                            </div>
+                        </div>
+                        <div class="option-grid mb-3">
+                            <input class="quiz-input" th:field="*{optionA}" placeholder="Đáp án A">
+                            <input class="quiz-input" th:field="*{optionB}" placeholder="Đáp án B">
+                            <input class="quiz-input" th:field="*{optionC}" placeholder="Đáp án C">
+                            <input class="quiz-input" th:field="*{optionD}" placeholder="Đáp án D">
+                        </div>
+                        <button class="btn-quiz-save" type="submit">
+                            <i class="bi bi-plus-lg"></i> Thêm câu hỏi
+                        </button>
+                    </div>
                 </form>
             </div>
-        </section>
+        </div>
 
-        <section class="panel">
-            <div class="panel-body table-responsive">
-                <h2 class="h5 fw-bold mb-3">Danh sách câu hỏi</h2>
-                <table class="table align-middle">
-                    <tbody>
-                    <tr th:each="question : ${quiz.questions}">
-                        <td>
-                            <div class="fw-semibold" th:text="${question.questionText}">Question</div>
-                            <small class="text-muted" th:text="${question.type + ' - Đáp án: ' + question.correctAnswer}">Type</small>
-                        </td>
-                        <td class="text-end">
-                            <a class="btn btn-sm btn-outline-primary" th:href="@{/teacher/questions/{id}/edit(id=${question.questionId})}">Sửa</a>
-                            <form class="d-inline" th:action="@{/teacher/questions/{id}/delete(id=${question.questionId})}" method="post" onsubmit="return confirm('Xóa câu hỏi này?');">
-                                <button class="btn btn-sm btn-outline-danger" type="submit">Xóa</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(quiz.questions)}">
-                        <td><div class="empty-state">Quiz chưa có câu hỏi.</div></td>
-                    </tr>
-                    </tbody>
-                </table>
+        <!-- Question list -->
+        <div class="quiz-section">
+            <div class="quiz-section-header" style="padding-bottom: 16px;">
+                <div class="quiz-section-icon icon-violet"><i class="bi bi-list-ol"></i></div>
+                <div>
+                    <p class="quiz-section-title">Danh sách câu hỏi
+                        <span style="color:#94a3b8; font-weight:500; font-size:.85rem; margin-left:6px;"
+                              th:text="'(' + ${#lists.size(quiz.questions)} + ' câu)'"></span>
+                    </p>
+                </div>
             </div>
-        </section>
-    </div>
+            <div class="quiz-section-body" style="padding-top:0">
+
+                <!-- Empty -->
+                <div th:if="${#lists.isEmpty(quiz.questions)}" class="empty-questions">
+                    <i class="bi bi-patch-question"></i>
+                    <p>Quiz chưa có câu hỏi nào. Hãy thêm câu hỏi đầu tiên!</p>
+                </div>
+
+                <!-- Question cards -->
+                <div class="d-flex flex-column gap-2" th:unless="${#lists.isEmpty(quiz.questions)}">
+                    <div class="question-card" th:each="question, stat : ${quiz.questions}">
+                        <div class="question-num" th:text="${stat.index + 1}">1</div>
+                        <div class="question-body">
+                            <div class="question-text" th:text="${question.questionText}">Question text</div>
+                            <div class="question-meta">
+                                <span th:text="${question.type}">MULTIPLE_CHOICE</span>
+                                &nbsp;·&nbsp;
+                                Đáp án: <strong th:text="${question.correctAnswer}">A</strong>
+                            </div>
+                        </div>
+                        <div class="question-actions">
+                            <a class="btn-q-edit"
+                               th:href="@{/teacher/questions/{id}/edit(id=${question.questionId})}">
+                                <i class="bi bi-pencil"></i> Sửa
+                            </a>
+                            <form class="d-inline"
+                                  th:action="@{/teacher/questions/{id}/delete(id=${question.questionId})}"
+                                  method="post" onsubmit="return confirm('Xóa câu hỏi này?');">
+                                <button class="btn-q-del" type="submit">
+                                    <i class="bi bi-trash3"></i> Xóa
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /quiz != null -->
+
 </main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

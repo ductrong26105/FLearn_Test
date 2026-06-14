@@ -102,7 +102,7 @@
             </div>
 
             <!-- ===== PDF EMBED (file nội bộ được serve qua /files/) ===== -->
-            <div th:if="${material.embedUrl == null and not #strings.isEmpty(material.filePath) and material.type == 'PDF'}" class="mb-4">
+            <div th:if="${material.embedUrl == null and not #strings.isEmpty(material.filePath) and material.type.name() == 'PDF'}" class="mb-4">
                 <h2 class="h6 fw-semibold text-muted mb-2">
                     <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i>
                     Xem tài liệu PDF
@@ -114,7 +114,6 @@
 
             <!-- ===== LINK FALLBACK (khi không thể embed) ===== -->
             <div class="d-flex flex-wrap gap-2 mb-4">
-                <!-- Nút mở link ngoài nếu không embed được hoặc là OTHER_LINK -->
                 <a th:if="${not #strings.isEmpty(material.externalUrl)}"
                    class="btn btn-outline-primary"
                    th:href="${material.externalUrl}"
@@ -123,7 +122,7 @@
                     <span th:if="${material.embedUrl != null}">Mở trong tab mới</span>
                     <span th:unless="${material.embedUrl != null}">Mở link</span>
                 </a>
-                <a th:if="${not #strings.isEmpty(material.filePath) and material.type != 'PDF'}"
+                <a th:if="${not #strings.isEmpty(material.filePath) and material.type.name() != 'PDF'}"
                    class="btn btn-outline-success"
                    th:href="${material.filePath}"
                    target="_blank">

@@ -25,6 +25,7 @@ public class QuizResponse {
     private Boolean shuffleQuestions;
     private Boolean shuffleAnswers;
     private Integer maxAttempts;
+    private Integer videoTimestamp; // giây trong video, null = không gate
     private boolean deadlinePassed;
     private long submittedAttempts;
     private List<QuestionResponse> questions;

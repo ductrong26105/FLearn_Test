@@ -84,6 +84,7 @@ public class TeacherQuizController {
                 .shuffleQuestions(quiz.getShuffleQuestions())
                 .shuffleAnswers(quiz.getShuffleAnswers())
                 .maxAttempts(quiz.getMaxAttempts())
+                .videoTimestamp(quiz.getVideoTimestamp())
                 .build());
         model.addAttribute("questionRequest", QuestionRequest.builder()
                 .type(QuestionType.MULTIPLE_CHOICE)

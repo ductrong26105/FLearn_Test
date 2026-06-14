@@ -47,6 +47,9 @@ public class Quiz {
     @Builder.Default
     private Integer maxAttempts = 1;
 
+    @Column(name = "[VideoTimestamp]")
+    private Integer videoTimestamp; // Giây trong video, null = không gate quiz
+
     @Column(name = "[CreatedAt]", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;

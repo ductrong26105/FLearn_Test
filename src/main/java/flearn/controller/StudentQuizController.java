@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import java.util.Map;
 
 @Controller
@@ -50,6 +52,18 @@ public class StudentQuizController {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
             return "redirect:/student/quizzes/" + quizId;
         }
+    }
+
+    /**
+     * AJAX endpoint dùng cho in-video quiz gate overlay.
+     * Trả về JSON thay vì redirect, cho phép JS xử lý kết quả và resume video.
+     */
+    @PostMapping("/quizzes/{quizId}/submit-gate")
+    @ResponseBody
+    public QuizResultResponse submitGate(@PathVariable Integer quizId,
+                                         @AuthenticationPrincipal CustomUserDetails userDetails,
+                                         @RequestParam Map<String, String> answers) {
+        return quizService.submitQuiz(quizId, userDetails.getUser(), answers);
     }
 
     @GetMapping("/quizzes/{quizId}/results")

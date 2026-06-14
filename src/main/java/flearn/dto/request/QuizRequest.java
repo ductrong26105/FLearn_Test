@@ -37,4 +37,7 @@ public class QuizRequest {
     @Min(value = 1, message = "Số lần làm bài tối thiểu là 1.")
     @Max(value = 50, message = "Số lần làm bài tối đa là 50.")
     private Integer maxAttempts;
+
+    @Min(value = 0, message = "Mốc thời gian video không được âm.")
+    private Integer videoTimestamp; // giây
 }
