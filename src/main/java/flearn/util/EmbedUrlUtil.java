@@ -85,6 +85,40 @@ public final class EmbedUrlUtil {
     }
 
     /**
+     * Trích xuất YouTube video ID từ URL bất kỳ (watch, short, embed, youtu.be).
+     * @return videoId nếu tìm thấy, null nếu không phải YouTube.
+     */
+    public static String extractYoutubeId(String url) {
+        if (url == null || url.isBlank()) return null;
+        String trimmed = url.trim();
+        // embed URL: .../embed/VIDEO_ID
+        if (trimmed.contains("youtube.com/embed/")) {
+            int idx = trimmed.indexOf("youtube.com/embed/") + "youtube.com/embed/".length();
+            String id = trimmed.substring(idx);
+            int end = id.indexOf('?');
+            return end != -1 ? id.substring(0, end) : id;
+        }
+        // watch URL
+        String id = extractQueryParam(trimmed, "v");
+        if (id != null && !id.isBlank()) return id;
+        // youtu.be
+        if (trimmed.contains("youtu.be/")) {
+            int idx = trimmed.indexOf("youtu.be/") + "youtu.be/".length();
+            id = trimmed.substring(idx);
+            int end = id.indexOf('?');
+            return end != -1 ? id.substring(0, end) : id;
+        }
+        // shorts
+        if (trimmed.contains("youtube.com/shorts/")) {
+            int idx = trimmed.indexOf("youtube.com/shorts/") + "youtube.com/shorts/".length();
+            id = trimmed.substring(idx);
+            int end = id.indexOf('?');
+            return end != -1 ? id.substring(0, end) : id;
+        }
+        return null;
+    }
+
+    /**
      * Trích xuất giá trị query param từ URL.
      */
     private static String extractQueryParam(String url, String paramName) {

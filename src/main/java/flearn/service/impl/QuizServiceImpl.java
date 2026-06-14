@@ -237,6 +237,7 @@ public class QuizServiceImpl implements QuizService {
         quiz.setShuffleQuestions(Boolean.TRUE.equals(request.getShuffleQuestions()));
         quiz.setShuffleAnswers(Boolean.TRUE.equals(request.getShuffleAnswers()));
         quiz.setMaxAttempts(request.getMaxAttempts() == null ? 1 : request.getMaxAttempts());
+        quiz.setVideoTimestamp(request.getVideoTimestamp()); // null = không gate
     }
 
     private void applyQuestion(Question question, QuestionRequest request) {
