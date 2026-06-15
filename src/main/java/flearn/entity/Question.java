@@ -2,6 +2,7 @@ package flearn.entity;
 
 import flearn.enums.QuestionType;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.*;
 
 @Entity
@@ -22,18 +23,23 @@ public class Question {
     @Builder.Default
     private QuestionType type = QuestionType.MULTIPLE_CHOICE;
 
+    @Nationalized
     @Column(name = "[QuestionText]", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String questionText;
 
+    @Nationalized
     @Column(name = "[OptionA]", columnDefinition = "NVARCHAR(500)")
     private String optionA;
 
+    @Nationalized
     @Column(name = "[OptionB]", columnDefinition = "NVARCHAR(500)")
     private String optionB;
 
+    @Nationalized
     @Column(name = "[OptionC]", columnDefinition = "NVARCHAR(500)")
     private String optionC;
 
+    @Nationalized
     @Column(name = "[OptionD]", columnDefinition = "NVARCHAR(500)")
     private String optionD;
 

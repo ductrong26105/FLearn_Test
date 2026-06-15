@@ -2,6 +2,7 @@ package flearn.entity;
 
 import flearn.enums.CourseStatus;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,9 +25,11 @@ public class Course {
     @Column(name = "[CourseCode]", unique = true, nullable = false, length = 50)
     private String courseCode;
 
+    @Nationalized
     @Column(name = "[CourseName]", nullable = false, length = 100)
     private String courseName;
 
+    @Nationalized
     @Column(name = "[Description]", length = 500)
     private String description;
 
