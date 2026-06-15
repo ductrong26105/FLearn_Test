@@ -2,6 +2,7 @@ package flearn.entity;
 
 import flearn.enums.EnrollmentStatus;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,9 +35,11 @@ public class Enrollment {
     @Builder.Default
     private EnrollmentStatus status = EnrollmentStatus.PENDING;
 
+    @Nationalized
     @Column(name = "[RequestMessage]", length = 500)
     private String requestMessage;
 
+    @Nationalized
     @Column(name = "[RejectReason]", length = 500)
     private String rejectReason;
 

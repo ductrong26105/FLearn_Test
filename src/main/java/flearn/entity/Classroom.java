@@ -2,6 +2,7 @@ package flearn.entity;
 
 import flearn.enums.ClassStatus;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,9 +23,11 @@ public class Classroom {
     @Column(name = "[ClassID]")
     private Integer classId;
 
+    @Nationalized
     @Column(name = "[ClassName]", nullable = false, length = 100)
     private String className;
 
+    @Nationalized
     @Column(name = "[Description]", length = 500)
     private String description;
 

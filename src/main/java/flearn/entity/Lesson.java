@@ -1,6 +1,7 @@
 package flearn.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.*;
 import java.util.Date;
 
@@ -13,9 +14,11 @@ public class Lesson {
     @Column(name = "[LessonID]")
     private Integer lessonId;
 
+    @Nationalized
     @Column(name = "[Title]", nullable = false, length = 200)
     private String title;
 
+    @Nationalized
     @Column(name = "[Content]", columnDefinition = "NVARCHAR(MAX)")
     private String content; // Ghi chú hoặc tóm tắt bài học
 

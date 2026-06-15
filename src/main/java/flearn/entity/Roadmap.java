@@ -1,6 +1,7 @@
 package flearn.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +21,11 @@ public class Roadmap {
     @Column(name = "[RoadmapID]")
     private Integer id;
 
+    @Nationalized
     @Column(name = "[Title]", nullable = false, length = 200)
     private String title;
 
+    @Nationalized
     @Column(name = "[Description]", length = 1000)
     private String description;
 

@@ -1,6 +1,7 @@
 package flearn.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.*;
 import java.util.Date;
 import java.util.List;
@@ -14,9 +15,11 @@ public class Quiz {
     @Column(name = "[QuizID]")
     private Integer quizId;
 
+    @Nationalized
     @Column(name = "[Title]", nullable = false, columnDefinition = "NVARCHAR(200)")
     private String title;
 
+    @Nationalized
     @Column(name = "[Description]", columnDefinition = "NVARCHAR(MAX)")
     private String description;
 

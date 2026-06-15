@@ -3,6 +3,7 @@ package flearn.entity;
 import flearn.enums.Role;
 import flearn.enums.UserStatus;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Nationalized;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,7 @@ public class User {
     @Column(name = "[PasswordHash]", nullable = false, length = 255)
     private String passwordHash;
 
+    @Nationalized
     @Column(name = "[FullName]", nullable = false, length = 100)
     private String fullName;
 
@@ -45,6 +47,7 @@ public class User {
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
+    @Nationalized
     @Column(name = "[Department]", length = 100)
     private String department;
 
