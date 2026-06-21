@@ -1,0 +1,107 @@
+[33mcommit e3c9e57526f1acb85065756d888f715c33316b2f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mTrongTD[m[33m, [m[1;31morigin/TrongTD[m[33m)[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Mon Jun 22 01:11:48 2026 +0700
+
+    Add materials and walkthrough
+
+[33mcommit 51d814e3dd214c63b4682e465986409f6e96d220[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Mon Jun 22 01:05:46 2026 +0700
+
+    Refactor quiz history and results pages with enhanced UI and improved structure
+
+[33mcommit 475bab4ca5ba366a6b6661905bc93a0a15e9cc4d[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Mon Jun 22 00:44:46 2026 +0700
+
+    Update user request validation
+
+[33mcommit fb916f6e4c46d574e773b46b4366c3789a24a335[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Sun Jun 21 23:57:37 2026 +0700
+
+    Add invite code toggle feature and enhance quiz question types
+
+[33mcommit 37b64750eba1aa088f9149f68c8e78398d65fbcc[m
+Merge: 0e7a046 b513660
+Author: ductrong26105 <ductrong26105@gmail.com>
+Date:   Sun Jun 14 13:30:27 2026 +0700
+
+    Merge pull request #4 from ductrong26105/main
+    
+    Enhance login, registration, and quiz UI features
+
+[33mcommit b513660750879f0ee010cffdd814d6a73510a9c2[m
+Merge: cc34e68 0e7a046
+Author: ductrong26105 <ductrong26105@gmail.com>
+Date:   Sun Jun 14 13:29:15 2026 +0700
+
+    Merge pull request #3 from ductrong26105/TrongTD
+    
+    Fix package issues
+
+[33mcommit 0e7a0462e46240d0a000c1a8cf422b8a61a20782[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Sun Jun 14 13:27:30 2026 +0700
+
+    Fix pakage
+
+[33mcommit 56d9b294422da59e93e801aaf6f22a10cb7d82f4[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Sun Jun 14 13:20:14 2026 +0700
+
+    Update
+
+[33mcommit cc34e68e48a805492c40999585af3679255c93d8[m
+Merge: 327becb 47ceb52
+Author: ductrong26105 <ductrong26105@gmail.com>
+Date:   Sun Jun 14 12:39:44 2026 +0700
+
+    Merge pull request #2 from ductrong26105/TrongTD
+    
+    Add video timestamp feature and enhance quiz UI
+
+[33mcommit 47ceb526c4e4959c387384d667eef0dbd8f327fc[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Sun Jun 14 12:38:25 2026 +0700
+
+    Add video timestamp feature and enhance quiz UI
+
+[33mcommit 327becb6de15802194a136bb171ac4a93cf9d849[m
+Merge: c729871 3764f91
+Author: ductrong26105 <ductrong26105@gmail.com>
+Date:   Thu Jun 11 16:17:16 2026 +0700
+
+    Merge pull request #1 from ductrong26105/TrongTD
+    
+    Enhance login and registration features
+
+[33mcommit 3764f91403801c1df22b92b18def21ad450ef68f[m
+Author: Tran Duc Trong <ductrong26105@gmail.com>
+Date:   Thu Jun 11 16:12:37 2026 +0700
+
+    Update features
+
+[33mcommit ce78194b99288dc6361d0a0da5010fd7ff71741d[m
+Author: Nguyen Minh Tuan <minhtuan111205@gmail.com>
+Date:   Wed Jun 10 12:55:16 2026 +0700
+
+    Update features
+
+[33mcommit 52998688913f4f2b91ee990ec1bc0a221a34ffa7[m
+Author: Nguyen Minh Tuan <minhtuan111205@gmail.com>
+Date:   Tue Jun 9 23:55:02 2026 +0700
+
+    Update login and register page
+
+[33mcommit 0965b153f576d6fd199735f8727ed249a0460f8c[m
+Author: Nguyen Minh Tuan <minhtuan111205@gmail.com>
+Date:   Tue Jun 9 22:45:46 2026 +0700
+
+    Initial commit
+
+[33mcommit c729871cbaf8f25b564729c7c99f0f3a85c7db39[m
+Author: ductrong26105 <ductrong26105@gmail.com>
+Date:   Thu Jun 11 15:46:31 2026 +0700
+
+    Initial commit
