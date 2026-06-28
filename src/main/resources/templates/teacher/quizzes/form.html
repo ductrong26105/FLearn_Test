@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${pageTitle + ' - FLearn'}">Quiz - FLearn</title>
+    <title th:text="${pageTitle + ' - FLearn'}">Bài tập - FLearn</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -100,6 +100,52 @@
             background: #fef2f2;
             color: #991b1b;
             border-left: 4px solid #ef4444;
+        }
+
+        /* ── Tab navigation ── */
+        .quiz-tabs {
+            display: flex;
+            gap: 4px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 6px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(15,23,42,.04);
+        }
+        .quiz-tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 700;
+            font-size: .95rem;
+            cursor: pointer;
+            transition: all .25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .quiz-tab-btn:hover { color: #1e293b; background: #f1f5f9; }
+        .quiz-tab-btn.active {
+            background: linear-gradient(135deg, #f26b21, #e05a12);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(242,107,33,.3);
+        }
+        .quiz-tab-btn .tab-count {
+            background: rgba(255,255,255,.25);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 800;
+        }
+        .quiz-tab-btn:not(.active) .tab-count {
+            background: #e2e8f0;
+            color: #64748b;
         }
 
         /* ── Section card ── */
@@ -343,7 +389,7 @@
         .question-body { flex: 1; min-width: 0; }
         .question-text { font-weight: 600; color: #0f172a; font-size: .95rem; margin-bottom: 4px; }
         .question-meta { font-size: .78rem; color: #64748b; }
-        .question-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .question-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
         .btn-q-edit, .btn-q-del {
             border-radius: 8px;
             padding: 6px 12px;
@@ -359,6 +405,28 @@
         .btn-q-edit:hover { background: #dbeafe; color: #1e40af; }
         .btn-q-del  { border-color: #fecaca; color: #dc2626; background: #fef2f2; }
         .btn-q-del:hover  { background: #fee2e2; }
+
+        /* Reorder buttons */
+        .btn-q-move {
+            border: 1.5px solid #e2e8f0;
+            background: #fff;
+            color: #94a3b8;
+            border-radius: 6px;
+            padding: 4px 7px;
+            font-size: .75rem;
+            cursor: pointer;
+            transition: all .15s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-q-move:hover { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+        .btn-q-move:disabled { opacity: .35; cursor: not-allowed; }
+        .reorder-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-shrink: 0;
+        }
 
         /* Add question form */
         .add-question-form {
@@ -381,6 +449,127 @@
         }
         .empty-questions i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
         .empty-questions p { margin: 0; font-weight: 500; }
+
+        /* ── Question preview ── */
+        .question-preview {
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            background: #fff;
+            padding: 20px 24px;
+            margin-top: 16px;
+            display: none;
+        }
+        .question-preview.show { display: block; }
+        .question-preview-title {
+            font-size: .78rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .question-preview-text {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 1rem;
+            margin-bottom: 14px;
+        }
+        .preview-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all .2s;
+        }
+        .preview-option.correct {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+        .preview-option-key {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 700;
+            font-size: .8rem;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .preview-option.correct .preview-option-key {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        /* ── Modal improvements ── */
+        .modal-confirm .modal-content {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.15);
+        }
+        .modal-confirm .modal-body {
+            padding: 32px;
+            text-align: center;
+        }
+        .modal-confirm .modal-icon {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+        }
+        .modal-icon-danger {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .modal-confirm h5 {
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+        .modal-confirm p {
+            color: #64748b;
+            font-size: .95rem;
+        }
+        .modal-confirm .modal-footer {
+            border: none;
+            padding: 0 32px 28px;
+            justify-content: center;
+            gap: 10px;
+        }
+        .modal-btn-cancel {
+            border: 1.5px solid #e2e8f0;
+            background: #fff;
+            color: #64748b;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+        }
+        .modal-btn-cancel:hover { background: #f1f5f9; }
+        .modal-btn-delete {
+            border: none;
+            background: #dc2626;
+            color: #fff;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .15s;
+            box-shadow: 0 4px 12px rgba(220,38,38,.3);
+        }
+        .modal-btn-delete:hover { background: #b91c1c; }
+
+        /* Tab content animation */
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; animation: fadeIn .25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -411,183 +600,169 @@
 
         <div class="quiz-hero-badge">
             <i class="bi bi-lightning-charge-fill"></i>
-            <span th:text="${quiz != null ? 'Chỉnh sửa Quiz' : 'Tạo mới'}">Tạo mới</span>
+            <span th:text="${quiz != null ? 'Chỉnh sửa bài tập' : 'Tạo mới'}">Tạo mới</span>
         </div>
 
-        <h1 class="quiz-hero-title" th:text="${pageTitle}">Cấu hình quiz</h1>
-        <p class="quiz-hero-sub">Thiết lập tên, mô tả, thời gian làm bài, deadline và các tùy chọn nâng cao.</p>
+        <h1 class="quiz-hero-title" th:text="${pageTitle}">Chi tiết bài tập</h1>
+        <p class="quiz-hero-sub">Thiết lập tên, mô tả, thời gian làm bài, deadline và quản lý câu hỏi.</p>
     </div>
 
-    <!-- ── Config form ── -->
-    <form th:action="@{${formAction}}" th:object="${quizRequest}" method="post" id="quizForm">
-
-        <!-- Section 1: Basic info -->
-        <div class="quiz-section">
-            <div class="quiz-section-header">
-                <div class="quiz-section-icon icon-orange"><i class="bi bi-pencil-square"></i></div>
-                <div>
-                    <p class="quiz-section-title">Thông tin cơ bản</p>
-                </div>
-            </div>
-            <div class="quiz-section-body">
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <label class="quiz-label">Tên quiz</label>
-                        <div class="quiz-input-group">
-                            <i class="bi bi-journal-text input-icon"></i>
-                            <input class="quiz-input" th:field="*{title}" required maxlength="200"
-                                   placeholder="Nhập tên quiz...">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="quiz-label">Số lần làm tối đa</label>
-                        <div class="quiz-input-group">
-                            <i class="bi bi-arrow-repeat input-icon"></i>
-                            <input class="quiz-input" type="number" min="1" max="50" th:field="*{maxAttempts}">
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <label class="quiz-label">Mô tả</label>
-                        <textarea class="quiz-input" rows="3" th:field="*{description}"
-                                  placeholder="Mô tả ngắn về quiz (tuỳ chọn)..."></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 2: Time & deadline -->
-        <div class="quiz-section">
-            <div class="quiz-section-header">
-                <div class="quiz-section-icon icon-sky"><i class="bi bi-clock"></i></div>
-                <div>
-                    <p class="quiz-section-title">Thời gian &amp; Deadline</p>
-                </div>
-            </div>
-            <div class="quiz-section-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="quiz-label">Thời gian làm bài (phút)</label>
-                        <div class="quiz-input-group">
-                            <i class="bi bi-stopwatch input-icon"></i>
-                            <input class="quiz-input" type="number" min="1" max="600"
-                                   th:field="*{timeLimitMinutes}" placeholder="Không giới hạn nếu để trống">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="quiz-label">Deadline nộp bài</label>
-                        <div class="quiz-input-group">
-                            <i class="bi bi-calendar-event input-icon"></i>
-                            <input class="quiz-input" type="datetime-local" name="deadline"
-                                   th:value="${quizRequest.deadline != null ? #dates.format(quizRequest.deadline, 'yyyy-MM-dd''T''HH:mm') : ''}">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="quiz-label">
-                            <i class="bi bi-collection-play" style="color:#6366f1"></i>
-                            Mốc video gate (giây)
-                        </label>
-                        <div class="quiz-input-group">
-                            <i class="bi bi-pin-angle input-icon"></i>
-                            <input class="quiz-input" type="number" min="0" th:field="*{videoTimestamp}"
-                                   placeholder="VD: 120 = tại phút 2:00">
-                        </div>
-                        <div style="font-size:.75rem;color:#94a3b8;margin-top:5px;">
-                            <i class="bi bi-info-circle"></i>
-                            Để trống = không gate. Chỉ hoạt động với video YouTube.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 3: Advanced options -->
-        <div class="quiz-section">
-            <div class="quiz-section-header">
-                <div class="quiz-section-icon icon-violet"><i class="bi bi-sliders"></i></div>
-                <div>
-                    <p class="quiz-section-title">Tùy chọn nâng cao</p>
-                </div>
-            </div>
-            <div class="quiz-section-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="toggle-row">
-                            <div class="toggle-info">
-                                <i class="bi bi-shuffle"></i>
-                                <div>
-                                    <div class="toggle-text">Đảo thứ tự câu hỏi</div>
-                                    <div class="toggle-sub">Câu hỏi xuất hiện ngẫu nhiên mỗi lần thi</div>
-                                </div>
-                            </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input quiz-toggle-input" type="checkbox" role="switch"
-                                       id="shuffleQuestions" th:field="*{shuffleQuestions}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="toggle-row">
-                            <div class="toggle-info">
-                                <i class="bi bi-arrow-left-right"></i>
-                                <div>
-                                    <div class="toggle-text">Đảo thứ tự đáp án</div>
-                                    <div class="toggle-sub">Đáp án A/B/C/D xuất hiện ngẫu nhiên</div>
-                                </div>
-                            </div>
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input quiz-toggle-input" type="checkbox" role="switch"
-                                       id="shuffleAnswers" th:field="*{shuffleAnswers}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </form>
-
-    <!-- ── Action bar (outside main form to avoid nested form bug) ── -->
-    <div class="quiz-actions">
-        <!-- Save button links back to quizForm via form attribute -->
-        <button class="btn-quiz-save" type="submit" form="quizForm">
-            <i class="bi bi-floppy2-fill"></i> Lưu cấu hình
+    <!-- ── Tab navigation (only in edit mode) ── -->
+    <div th:if="${quiz != null}" class="quiz-tabs">
+        <button class="quiz-tab-btn active" onclick="switchTab('config', this)">
+            <i class="bi bi-gear"></i> Cấu hình
         </button>
-
-        <th:block th:if="${quiz != null}">
-            <!-- Publish / Unpublish (standalone form) -->
-            <form th:action="@{/teacher/quizzes/{id}/publish(id=${quiz.quizId})}" method="post" style="margin:0">
-                <button class="btn-quiz-publish" type="submit">
-                    <i class="bi" th:classappend="${quiz.published ? 'bi-eye-slash' : 'bi-eye'}"></i>
-                    <span th:text="${quiz.published ? 'Unpublish' : 'Publish'}">Publish</span>
-                </button>
-            </form>
-
-            <a class="btn-quiz-results"
-               th:href="@{/teacher/quizzes/{id}/results(id=${quiz.quizId})}">
-                <i class="bi bi-bar-chart-line"></i> Xem kết quả
-            </a>
-
-            <div class="actions-spacer"></div>
-
-            <!-- Current status pill -->
-            <span class="publish-pill"
-                  th:classappend="${quiz.published ? 'pill-published' : 'pill-draft'}">
-                <i class="bi" th:classappend="${quiz.published ? 'bi-check-circle-fill' : 'bi-circle-half'}"></i>
-                <span th:text="${quiz.published ? 'PUBLISHED' : 'DRAFT'}">DRAFT</span>
-            </span>
-
-            <!-- Delete (standalone form) -->
-            <form th:action="@{/teacher/quizzes/{id}/delete(id=${quiz.quizId})}" method="post" style="margin:0"
-                  onsubmit="return confirm('Xóa quiz này và toàn bộ kết quả?');">
-                <button class="btn-quiz-danger" type="submit">
-                    <i class="bi bi-trash3"></i> Xóa quiz
-                </button>
-            </form>
-        </th:block>
+        <button class="quiz-tab-btn" onclick="switchTab('questions', this)">
+            <i class="bi bi-list-check"></i> Câu hỏi
+            <span class="tab-count" th:text="${#lists.size(quiz.questions)}">0</span>
+        </button>
     </div>
 
-    <!-- ── Add question + question list (only when editing existing quiz) ── -->
-    <div th:if="${quiz != null}">
+    <!-- ══════════════════════════════════════════ -->
+    <!-- ── TAB 1: CẤU HÌNH ── -->
+    <!-- ══════════════════════════════════════════ -->
+    <div id="tab-config" class="tab-pane active">
+
+        <!-- ── Config form ── -->
+        <form th:action="@{${formAction}}" th:object="${quizRequest}" method="post" id="quizForm">
+
+            <!-- Section 1: Basic info -->
+            <div class="quiz-section">
+                <div class="quiz-section-header">
+                    <div class="quiz-section-icon icon-orange"><i class="bi bi-pencil-square"></i></div>
+                    <div>
+                        <p class="quiz-section-title">Thông tin cơ bản</p>
+                    </div>
+                </div>
+                <div class="quiz-section-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="quiz-label">Tên bài tập</label>
+                            <div class="quiz-input-group">
+                                <i class="bi bi-journal-text input-icon"></i>
+                                <input class="quiz-input" th:field="*{title}" required maxlength="200"
+                                       placeholder="Nhập tên bài tập...">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="quiz-label">Số lần làm tối đa</label>
+                            <div class="quiz-input-group">
+                                <i class="bi bi-arrow-repeat input-icon"></i>
+                                <input class="quiz-input" type="number" min="1" max="50" th:field="*{maxAttempts}">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="quiz-label">Mô tả</label>
+                            <textarea class="quiz-input" rows="3" th:field="*{description}"
+                                      placeholder="Mô tả ngắn về bài tập (tuỳ chọn)..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Time & deadline -->
+            <div class="quiz-section">
+                <div class="quiz-section-header">
+                    <div class="quiz-section-icon icon-sky"><i class="bi bi-clock"></i></div>
+                    <div>
+                        <p class="quiz-section-title">Thời gian &amp; Deadline</p>
+                    </div>
+                </div>
+                <div class="quiz-section-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="quiz-label">Thời gian làm bài (phút)</label>
+                            <div class="quiz-input-group">
+                                <i class="bi bi-stopwatch input-icon"></i>
+                                <input class="quiz-input" type="number" min="1" max="600"
+                                       th:field="*{timeLimitMinutes}" placeholder="Không giới hạn nếu để trống">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="quiz-label">Deadline nộp bài</label>
+                            <div class="quiz-input-group">
+                                <i class="bi bi-calendar-event input-icon"></i>
+                                <input class="quiz-input" type="datetime-local" name="deadline"
+                                       th:value="${quizRequest.deadline != null ? #dates.format(quizRequest.deadline, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Advanced options -->
+            <div class="quiz-section">
+                <div class="quiz-section-header">
+                    <div class="quiz-section-icon icon-violet"><i class="bi bi-sliders"></i></div>
+                    <div>
+                        <p class="quiz-section-title">Tùy chọn nâng cao</p>
+                    </div>
+                </div>
+                <div class="quiz-section-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="toggle-row">
+                                <div class="toggle-info">
+                                    <i class="bi bi-shuffle"></i>
+                                    <div>
+                                        <div class="toggle-text">Đảo thứ tự câu hỏi</div>
+                                        <div class="toggle-sub">Câu hỏi xuất hiện ngẫu nhiên mỗi lần thi</div>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input quiz-toggle-input" type="checkbox" role="switch"
+                                           id="shuffleQuestions" th:field="*{shuffleQuestions}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="toggle-row">
+                                <div class="toggle-info">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                    <div>
+                                        <div class="toggle-text">Đảo thứ tự đáp án</div>
+                                        <div class="toggle-sub">Đáp án A/B/C/D xuất hiện ngẫu nhiên</div>
+                                    </div>
+                                </div>
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input quiz-toggle-input" type="checkbox" role="switch"
+                                           id="shuffleAnswers" th:field="*{shuffleAnswers}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- ── Action bar ── -->
+        <div class="quiz-actions">
+            <button class="btn-quiz-save" type="submit" form="quizForm">
+                <i class="bi bi-floppy2-fill"></i> Lưu thay đổi
+            </button>
+
+            <th:block th:if="${quiz != null}">
+                <a class="btn-quiz-results"
+                   th:href="@{/teacher/quizzes/{id}/results(id=${quiz.quizId})}">
+                    <i class="bi bi-bar-chart-line"></i> Xem kết quả
+                </a>
+
+                <div class="actions-spacer"></div>
+
+                <!-- Delete → triggers modal -->
+                <button class="btn-quiz-danger" type="button" data-bs-toggle="modal" data-bs-target="#deleteQuizModal">
+                    <i class="bi bi-trash3"></i> Xóa bài tập
+                </button>
+            </th:block>
+        </div>
+
+    </div><!-- /tab-config -->
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- ── TAB 2: CÂU HỎI (only edit mode) ── -->
+    <!-- ══════════════════════════════════════════ -->
+    <div th:if="${quiz != null}" id="tab-questions" class="tab-pane">
 
         <!-- Add question -->
         <div class="quiz-section">
@@ -600,43 +775,86 @@
                       th:object="${questionRequest}" method="post">
                     <div class="add-question-form">
                         <div class="row g-3 mb-3">
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 <label class="quiz-label">Loại câu hỏi</label>
-                                <select class="quiz-input" style="height:44px" th:field="*{type}">
+                                <select class="quiz-input" style="height:44px" th:field="*{type}" id="qTypeSelect" onchange="toggleQuestionType()">
                                     <option th:each="type : ${questionTypes}"
                                             th:value="${type}" th:text="${type}">TYPE</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="quiz-label">Thứ tự</label>
-                                <input class="quiz-input" type="number" th:field="*{orderIndex}">
+                                <input class="quiz-input" type="number" th:field="*{orderIndex}" id="orderIndexInput">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6" id="correctAnswerWrapper">
                                 <label class="quiz-label">Đáp án đúng</label>
-                                <select class="quiz-input" style="height:44px" th:field="*{correctAnswer}">
-                                    <option value="A">A</option>
-                                    <option value="B">B</option>
-                                    <option value="C">C</option>
-                                    <option value="D">D</option>
-                                    <option value="TRUE">TRUE</option>
-                                    <option value="FALSE">FALSE</option>
-                                </select>
+                                <input type="hidden" th:field="*{correctAnswer}" id="realCorrectAnswer">
+                                
+                                <div id="uiMultipleChoice" class="d-flex flex-wrap gap-3 mt-2">
+                                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="A" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">A</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="B" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">B</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="C" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">C</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="D" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">D</label></div>
+                                </div>
+                                
+                                <div id="uiMultiSelect" class="d-flex flex-wrap gap-3 mt-2" style="display:none !important;">
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="A" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">A</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="B" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">B</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="C" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">C</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="D" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">D</label></div>
+                                </div>
+                                
+                                <div id="uiTrueFalse" class="d-flex gap-3 mt-2" style="display:none !important;">
+                                    <div class="form-check"><input class="form-check-input" type="radio" name="uiTF" value="TRUE" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">TRUE</label></div>
+                                    <div class="form-check"><input class="form-check-input" type="radio" name="uiTF" value="FALSE" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">FALSE</label></div>
+                                </div>
                             </div>
                             <div class="col-12">
                                 <label class="quiz-label">Nội dung câu hỏi</label>
                                 <textarea class="quiz-input" rows="2" th:field="*{questionText}"
-                                          required placeholder="Nhập nội dung câu hỏi..."></textarea>
+                                          required placeholder="Nhập nội dung câu hỏi..." id="questionTextInput"
+                                          oninput="updatePreview()"></textarea>
                             </div>
                         </div>
-                        <div class="option-grid mb-3">
-                            <input class="quiz-input" th:field="*{optionA}" placeholder="Đáp án A">
-                            <input class="quiz-input" th:field="*{optionB}" placeholder="Đáp án B">
-                            <input class="quiz-input" th:field="*{optionC}" placeholder="Đáp án C">
-                            <input class="quiz-input" th:field="*{optionD}" placeholder="Đáp án D">
+                        <div class="option-grid mb-3" id="optionsContainer">
+                            <input class="quiz-input" th:field="*{optionA}" placeholder="Đáp án A" oninput="updatePreview()">
+                            <input class="quiz-input" th:field="*{optionB}" placeholder="Đáp án B" oninput="updatePreview()">
+                            <input class="quiz-input" th:field="*{optionC}" placeholder="Đáp án C" oninput="updatePreview()">
+                            <input class="quiz-input" th:field="*{optionD}" placeholder="Đáp án D" oninput="updatePreview()">
+                        </div>
+                        <div class="mb-3" id="modelAnswerContainer" style="display:none !important;">
+                            <label class="quiz-label">Đáp án mẫu (đối chiếu cho câu tự luận)</label>
+                            <textarea class="quiz-input" rows="3" th:field="*{modelAnswer}" placeholder="Nhập văn bản đáp án đúng..."></textarea>
                         </div>
                         <button class="btn-quiz-save" type="submit">
-                            <i class="bi bi-plus-lg"></i> Thêm câu hỏi
+                            <i class="bi bi-floppy2-fill"></i> Lưu câu hỏi
                         </button>
+                    </div>
+
+                    <!-- ── Question Preview ── -->
+                    <div class="question-preview" id="questionPreview">
+                        <div class="question-preview-title">
+                            <i class="bi bi-eye"></i> Xem trước
+                        </div>
+                        <div class="question-preview-text" id="previewQuestionText">Nội dung câu hỏi...</div>
+                        <div id="previewOptions">
+                            <div class="preview-option" id="previewOptA">
+                                <div class="preview-option-key">A</div>
+                                <div>Đáp án A</div>
+                            </div>
+                            <div class="preview-option" id="previewOptB">
+                                <div class="preview-option-key">B</div>
+                                <div>Đáp án B</div>
+                            </div>
+                            <div class="preview-option" id="previewOptC">
+                                <div class="preview-option-key">C</div>
+                                <div>Đáp án C</div>
+                            </div>
+                            <div class="preview-option" id="previewOptD">
+                                <div class="preview-option-key">D</div>
+                                <div>Đáp án D</div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -658,12 +876,13 @@
                 <!-- Empty -->
                 <div th:if="${#lists.isEmpty(quiz.questions)}" class="empty-questions">
                     <i class="bi bi-patch-question"></i>
-                    <p>Quiz chưa có câu hỏi nào. Hãy thêm câu hỏi đầu tiên!</p>
+                    <p>Bài tập chưa có câu hỏi nào. Hãy thêm câu hỏi đầu tiên!</p>
                 </div>
 
                 <!-- Question cards -->
                 <div class="d-flex flex-column gap-2" th:unless="${#lists.isEmpty(quiz.questions)}">
                     <div class="question-card" th:each="question, stat : ${quiz.questions}">
+                        <!-- Reorder buttons removed -->
                         <div class="question-num" th:text="${stat.index + 1}">1</div>
                         <div class="question-body">
                             <div class="question-text" th:text="${question.questionText}">Question text</div>
@@ -678,23 +897,253 @@
                                th:href="@{/teacher/questions/{id}/edit(id=${question.questionId})}">
                                 <i class="bi bi-pencil"></i> Sửa
                             </a>
-                            <form class="d-inline"
-                                  th:action="@{/teacher/questions/{id}/delete(id=${question.questionId})}"
-                                  method="post" onsubmit="return confirm('Xóa câu hỏi này?');">
-                                <button class="btn-q-del" type="submit">
-                                    <i class="bi bi-trash3"></i> Xóa
-                                </button>
-                            </form>
+                            <button class="btn-q-del" type="button"
+                                    th:attr="data-question-id=${question.questionId}"
+                                    onclick="showDeleteQuestionModal(this)">
+                                <i class="bi bi-trash3"></i> Xóa
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-    </div><!-- /quiz != null -->
+    </div><!-- /tab-questions -->
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- ── MODALS ── -->
+    <!-- ══════════════════════════════════════════ -->
+
+    <!-- Delete Quiz Modal -->
+    <div th:if="${quiz != null}" class="modal fade modal-confirm" id="deleteQuizModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-icon modal-icon-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <h5>Xóa bài tập?</h5>
+                    <p>Hành động này sẽ xóa bài tập, toàn bộ câu hỏi và kết quả liên quan. Không thể hoàn tác.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn-cancel" data-bs-dismiss="modal">Hủy</button>
+                    <form th:action="@{/teacher/quizzes/{id}/delete(id=${quiz.quizId})}" method="post" style="margin:0">
+                        <button class="modal-btn-delete" type="submit">
+                            <i class="bi bi-trash3"></i> Xóa vĩnh viễn
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Question Modal -->
+    <div th:if="${quiz != null}" class="modal fade modal-confirm" id="deleteQuestionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-icon modal-icon-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                    </div>
+                    <h5>Xóa câu hỏi?</h5>
+                    <p>Câu hỏi sẽ bị xóa khỏi bài tập. Không thể hoàn tác.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn-cancel" data-bs-dismiss="modal">Hủy</button>
+                    <form id="deleteQuestionForm" method="post" style="margin:0">
+                        <button class="modal-btn-delete" type="submit">
+                            <i class="bi bi-trash3"></i> Xóa câu hỏi
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    /* ── Tab switching ── */
+    function switchTab(tabName, btn) {
+        // Hide all panes
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        // Deactivate all buttons
+        document.querySelectorAll('.quiz-tab-btn').forEach(b => b.classList.remove('active'));
+        // Activate
+        document.getElementById('tab-' + tabName).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    /* ── Question type toggling ── */
+    function toggleQuestionType() {
+        const type = document.getElementById('qTypeSelect').value;
+        const optionsContainer = document.getElementById('optionsContainer');
+        const correctAnswerWrapper = document.getElementById('correctAnswerWrapper');
+        const modelAnswerContainer = document.getElementById('modelAnswerContainer');
+        
+        const uiMultipleChoice = document.getElementById('uiMultipleChoice');
+        const uiMultiSelect = document.getElementById('uiMultiSelect');
+        const uiTrueFalse = document.getElementById('uiTrueFalse');
+        
+        // Hide all first
+        uiMultipleChoice.style.setProperty('display', 'none', 'important');
+        uiMultiSelect.style.setProperty('display', 'none', 'important');
+        uiTrueFalse.style.setProperty('display', 'none', 'important');
+        
+        if (type === 'MULTIPLE_CHOICE') {
+            optionsContainer.style.display = 'grid';
+            correctAnswerWrapper.style.display = 'block';
+            modelAnswerContainer.style.setProperty('display', 'none', 'important');
+            uiMultipleChoice.style.setProperty('display', 'flex', 'important');
+        } else if (type === 'MULTI_SELECT') {
+            optionsContainer.style.display = 'grid';
+            correctAnswerWrapper.style.display = 'block';
+            modelAnswerContainer.style.setProperty('display', 'none', 'important');
+            uiMultiSelect.style.setProperty('display', 'flex', 'important');
+        } else if (type === 'TRUE_FALSE') {
+            optionsContainer.style.display = 'none';
+            correctAnswerWrapper.style.display = 'block';
+            modelAnswerContainer.style.setProperty('display', 'none', 'important');
+            uiTrueFalse.style.setProperty('display', 'flex', 'important');
+        } else if (type === 'ESSAY') {
+            optionsContainer.style.display = 'none';
+            correctAnswerWrapper.style.display = 'none';
+            modelAnswerContainer.style.setProperty('display', 'block', 'important');
+        }
+        
+        syncCorrectAnswer();
+        updatePreview();
+    }
+
+    function syncCorrectAnswer() {
+        const type = document.getElementById('qTypeSelect').value;
+        const realInput = document.getElementById('realCorrectAnswer');
+        
+        if (type === 'MULTIPLE_CHOICE') {
+            const checked = document.querySelector('input[name="uiRadio"]:checked');
+            realInput.value = checked ? checked.value : '';
+        } else if (type === 'MULTI_SELECT') {
+            const checked = Array.from(document.querySelectorAll('input[name="uiCheck"]:checked'));
+            realInput.value = checked.map(cb => cb.value).join(',');
+        } else if (type === 'TRUE_FALSE') {
+            const checked = document.querySelector('input[name="uiTF"]:checked');
+            realInput.value = checked ? checked.value : '';
+        } else if (type === 'ESSAY') {
+            realInput.value = '';
+        }
+        updatePreview();
+    }
+
+    /* ── Question Preview ── */
+    function updatePreview() {
+        const questionText = document.getElementById('questionTextInput');
+        const preview = document.getElementById('questionPreview');
+        if (!questionText || !preview) return;
+
+        const text = questionText.value.trim();
+        const type = document.getElementById('qTypeSelect').value;
+        
+        // Show preview when user starts typing
+        if (text.length > 0) {
+            preview.classList.add('show');
+        } else {
+            preview.classList.remove('show');
+            return;
+        }
+
+        document.getElementById('previewQuestionText').textContent = text;
+        
+        const previewOptions = document.getElementById('previewOptions');
+        const correctAnswer = document.getElementById('realCorrectAnswer').value;
+        const correctSet = new Set(correctAnswer.split(',').filter(v => v));
+
+        if (type === 'ESSAY') {
+            previewOptions.innerHTML = '<div style="color:#94a3b8; font-style:italic; padding:12px;">Câu tự luận — sinh viên nhập câu trả lời tự do</div>';
+            return;
+        }
+
+        if (type === 'TRUE_FALSE') {
+            previewOptions.innerHTML = ['TRUE', 'FALSE'].map(key => {
+                const isCorrect = correctSet.has(key);
+                return `<div class="preview-option ${isCorrect ? 'correct' : ''}">
+                    <div class="preview-option-key">${key === 'TRUE' ? '✓' : '✗'}</div>
+                    <div>${key === 'TRUE' ? 'Đúng' : 'Sai'}</div>
+                </div>`;
+            }).join('');
+            return;
+        }
+
+        // MULTIPLE_CHOICE / MULTI_SELECT
+        const fields = ['optionA', 'optionB', 'optionC', 'optionD'];
+        const keys = ['A', 'B', 'C', 'D'];
+        previewOptions.innerHTML = keys.map((key, i) => {
+            const input = document.getElementById(fields[i]);
+            const val = input ? input.value : '';
+            const isCorrect = correctSet.has(key);
+            return `<div class="preview-option ${isCorrect ? 'correct' : ''}">
+                <div class="preview-option-key">${key}</div>
+                <div>${val || 'Đáp án ' + key}</div>
+            </div>`;
+        }).join('');
+    }
+
+    /* ── Delete question modal ── */
+    function showDeleteQuestionModal(btn) {
+        const questionId = btn.getAttribute('data-question-id');
+        const form = document.getElementById('deleteQuestionForm');
+        form.action = '/teacher/questions/' + questionId + '/delete';
+        new bootstrap.Modal(document.getElementById('deleteQuestionModal')).show();
+    }
+
+    /* ── Auto-fill orderIndex ── */
+    function autoFillOrderIndex() {
+        const orderInput = document.getElementById('orderIndexInput');
+        if (!orderInput) return;
+        // Count existing questions from question-card elements
+        const existingCount = document.querySelectorAll('.question-card').length;
+        if (orderInput.value === '0' || orderInput.value === '') {
+            orderInput.value = existingCount + 1;
+        }
+    }
+
+    /* ── Init ── */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Restore radio/checkbox state
+        const realInput = document.getElementById('realCorrectAnswer');
+        if (realInput && realInput.value) {
+            const vals = realInput.value.split(',');
+            if (vals.length === 1 && ['A','B','C','D'].includes(vals[0])) {
+                const r = document.querySelector(`input[name="uiRadio"][value="${vals[0]}"]`);
+                if(r) r.checked = true;
+            }
+            vals.forEach(v => {
+                if (['A','B','C','D'].includes(v)) {
+                    const cb = document.querySelector(`input[name="uiCheck"][value="${v}"]`);
+                    if(cb) cb.checked = true;
+                }
+            });
+            if (vals.length === 1 && ['TRUE','FALSE'].includes(vals[0])) {
+                const tf = document.querySelector(`input[name="uiTF"][value="${vals[0]}"]`);
+                if(tf) tf.checked = true;
+            }
+        }
+        
+        const qTypeSelect = document.getElementById('qTypeSelect');
+        if (qTypeSelect) {
+            toggleQuestionType();
+        }
+
+        autoFillOrderIndex();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tab') === 'questions') {
+            const questionsTabBtn = document.querySelectorAll('.quiz-tab-btn')[1];
+            if (questionsTabBtn) {
+                switchTab('questions', questionsTabBtn);
+            }
+        }
+    });
+</script>
 </body>
 </html>

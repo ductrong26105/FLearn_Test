@@ -52,20 +52,40 @@ public class AuthController {
                                   BindingResult bindingResult,
                                   Model model,
                                   RedirectAttributes redirectAttributes) {
-        // Kiểm tra lỗi hợp lệ dữ liệu đầu vào (ví dụ: email sai định dạng, mật khẩu quá ngắn...)
         if (bindingResult.hasErrors()) {
             model.addAttribute("errorMsg", ValidationMessage.firstError(bindingResult));
             return "auth/register";
         }
         try {
-            // Thực hiện nghiệp vụ đăng ký tài khoản học viên thông qua AuthService
             authService.registerStudent(request);
-            redirectAttributes.addFlashAttribute("successMsg", "Đăng ký thành công. Bạn có thể đăng nhập ngay.");
-            return "redirect:/login";
+            redirectAttributes.addFlashAttribute("email", request.getEmail());
+            return "redirect:/verify-otp";
         } catch (RuntimeException e) {
-            // Bắt các ngoại lệ logic nghiệp vụ (ví dụ: trùng lặp email...)
             model.addAttribute("errorMsg", e.getMessage());
             return "auth/register";
+        }
+    }
+
+    @GetMapping("/verify-otp")
+    public String showVerifyOtpForm(Model model) {
+        if (model.getAttribute("email") == null) {
+            return "redirect:/register";
+        }
+        return "auth/verify-otp";
+    }
+
+    @PostMapping("/verify-otp")
+    public String processVerifyOtp(@org.springframework.web.bind.annotation.RequestParam String email,
+                                   @org.springframework.web.bind.annotation.RequestParam String otpCode,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            authService.verifyAccount(email, otpCode);
+            redirectAttributes.addFlashAttribute("successMsg", "Xác thực thành công. Bạn có thể đăng nhập ngay.");
+            return "redirect:/login";
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            redirectAttributes.addFlashAttribute("email", email);
+            return "redirect:/verify-otp";
         }
     }
 }

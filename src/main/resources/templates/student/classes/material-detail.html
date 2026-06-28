@@ -72,9 +72,26 @@
                                     <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>Xem tài liệu PDF
                                 </h2>
                                 <div style="width:100%;height:70vh;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,.06);">
-                                    <iframe th:src="${material.filePath}" style="width:100%;height:100%;border:none;"></iframe>
+                                    <!-- [FIX-PDF] Dùng endpoint /pdf thay vì filePath trực tiếp
+                                         để tránh X-Frame-Options: DENY từ Spring Security -->
+                                    <iframe th:src="@{/student/materials/{id}/pdf(id=${material.id})}"
+                                            style="width:100%;height:100%;border:none;"
+                                            th:title="${material.title}">
+                                        <p>Trình duyệt không hỗ trợ xem PDF trực tiếp.
+                                            <a th:href="@{/student/materials/{id}/pdf(id=${material.id})}">Tải xuống PDF</a>
+                                        </p>
+                                    </iframe>
+                                </div>
+                                <!-- Nút tải xuống PDF -->
+                                <div class="mt-2 text-end">
+                                    <a th:href="@{/student/materials/{id}/pdf(id=${material.id})}"
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i> Mở PDF trong tab mới
+                                    </a>
                                 </div>
                             </div>
+
 
                             <!-- ===== LINK BUTTONS ===== -->
                             <div class="d-flex flex-wrap gap-2 mb-4">

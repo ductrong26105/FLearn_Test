@@ -23,6 +23,9 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
 
     List<Enrollment> findByClassRoomAndStatus(Classroom classRoom, EnrollmentStatus status);
 
+    /** Lấy tất cả enrollment theo student và status (dùng cho TKB học tập). */
+    List<Enrollment> findByStudentAndStatus(User student, EnrollmentStatus status);
+
     @Query("""
             SELECT e FROM Enrollment e
             WHERE e.student = :student

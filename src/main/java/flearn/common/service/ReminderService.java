@@ -3,6 +3,7 @@ package flearn.common.service;
 import flearn.entity.*;
 import flearn.enums.ClassStatus;
 import flearn.enums.EnrollmentStatus;
+import flearn.enums.QuizSubmissionStatus;
 import flearn.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,6 +36,7 @@ public class ReminderService {
 
     private static final String TYPE_1DAY   = "1DAY";
     private static final String TYPE_2HOURS = "2HOURS";
+    private static final String TYPE_2HOURS_ASSIGNMENT = "2HOURS";
     // Window cho phép: ±10 phút xung quanh mốc nhắc
     private static final long WINDOW_MINUTES = 10;
 
@@ -39,6 +44,12 @@ public class ReminderService {
     private final EnrollmentRepository    enrollmentRepository;
     private final ReminderLogRepository   reminderLogRepository;
     private final EmailService            emailService;
+    private final QuizRepository          quizRepository;
+    private final LessonRepository        lessonRepository;
+    private final AssignmentReminderLogRepository assignmentReminderLogRepository;
+    private final QuizResultRepository    quizResultRepository;
+    private final MaterialRepository      materialRepository;
+    private final MaterialTrackingRepository materialTrackingRepository;
 
     /**
      * Cron mỗi 5 phút kiểm tra và gửi email nhắc nhở.
@@ -48,39 +59,37 @@ public class ReminderService {
     @Transactional
     public void checkAndSendReminders() {
         List<ClassSchedule> schedules = classScheduleRepository.findAllActive();
-        if (schedules.isEmpty()) return;
-
         LocalDateTime now = LocalDateTime.now();
-        log.debug("[Reminder] Cron triggered at {}, checking {} schedules", now, schedules.size());
-
-        for (ClassSchedule schedule : schedules) {
-            try {
-                processSchedule(schedule, now);
-            } catch (Exception ex) {
-                log.error("[Reminder] Error processing schedule id={}: {}", schedule.getId(), ex.getMessage());
+        
+        if (!schedules.isEmpty()) {
+            log.debug("[Reminder] Cron triggered at {}, checking {} schedules", now, schedules.size());
+            for (ClassSchedule schedule : schedules) {
+                try {
+                    processSchedule(schedule, now);
+                } catch (Exception ex) {
+                    log.error("[Reminder] Error processing schedule id={}: {}", schedule.getId(), ex.getMessage());
+                }
             }
         }
+        
+        checkAndSendAssignmentReminders();
     }
 
     private void processSchedule(ClassSchedule schedule, LocalDateTime now) {
-        // Tính buổi học tiếp theo trong tuần
-        LocalDateTime nextClass = nextOccurrence(schedule.getDayOfWeek(), schedule.getStartTime(), now);
+        // Lấy ngày giờ buổi học cụ thể
+        LocalDateTime nextClass = LocalDateTime.of(schedule.getScheduleDate(), schedule.getStartTime());
 
         // Tính khoảng cách giờ tới buổi học
         long minutesUntilClass = java.time.Duration.between(now, nextClass).toMinutes();
 
-        long oneDayMinutes   = 24 * 60;
         long twoHourMinutes  = 2 * 60;
 
-        boolean sendOneDay   = schedule.getRemindOneDayBefore()
-                && minutesUntilClass >= (oneDayMinutes - WINDOW_MINUTES)
-                && minutesUntilClass <= (oneDayMinutes + WINDOW_MINUTES);
-
+        // Chỉ nhắc trước 2 tiếng
         boolean sendTwoHours = schedule.getRemindTwoHoursBefore()
                 && minutesUntilClass >= (twoHourMinutes - WINDOW_MINUTES)
                 && minutesUntilClass <= (twoHourMinutes + WINDOW_MINUTES);
 
-        if (!sendOneDay && !sendTwoHours) return;
+        if (!sendTwoHours) return;
 
         // Lấy tất cả sinh viên active của lớp này
         List<User> students = enrollmentRepository
@@ -92,12 +101,7 @@ public class ReminderService {
         LocalDate classDate = nextClass.toLocalDate();
 
         for (User student : students) {
-            if (sendOneDay) {
-                sendIfNotSent(schedule, student, TYPE_1DAY, classDate, nextClass);
-            }
-            if (sendTwoHours) {
-                sendIfNotSent(schedule, student, TYPE_2HOURS, classDate, nextClass);
-            }
+            sendIfNotSent(schedule, student, TYPE_2HOURS, classDate, nextClass);
         }
     }
 
@@ -131,42 +135,20 @@ public class ReminderService {
         }
     }
 
-    /**
-     * Tính buổi học tiếp theo trong tuần từ dayOfWeek + startTime.
-     * Nếu hôm nay đúng thứ đó nhưng giờ đã qua → lấy tuần sau.
-     */
-    private LocalDateTime nextOccurrence(int targetDayOfWeek, LocalTime startTime, LocalDateTime now) {
-        // Java DayOfWeek: 1=Mon, ..., 7=Sun. DB lưu: 2=T2(Mon), ..., 7=T7(Sat), 1=CN(Sun)
-        // Chuẩn hóa sang Java DayOfWeek ISO: Mon=1...Sun=7
-        int isoDow = targetDayOfWeek == 1 ? 7 : targetDayOfWeek - 1;
-        DayOfWeek targetDow = DayOfWeek.of(isoDow);
-
-        LocalDate today = now.toLocalDate();
-        LocalDate candidate = today.with(java.time.temporal.TemporalAdjusters.nextOrSame(targetDow));
-        LocalDateTime candidateDT = candidate.atTime(startTime);
-
-        // Nếu thời điểm candidate đã qua → lấy tuần sau
-        if (!candidateDT.isAfter(now)) {
-            candidate = candidate.plusWeeks(1);
-            candidateDT = candidate.atTime(startTime);
-        }
-        return candidateDT;
-    }
+    // Xóa nextOccurrence() vì giờ đã dùng scheduleDate cụ thể
 
     private String buildSubject(String type, ClassSchedule schedule) {
-        String timeLabel = TYPE_1DAY.equals(type) ? "1 ngày" : "2 tiếng";
-        return String.format("[FLearn] Nhắc nhở: Lớp \"%s\" sẽ bắt đầu sau %s",
-                schedule.getClassroom().getClassName(), timeLabel);
+        return String.format("[FLearn] Nhắc nhở: Lớp \"%s\" sẽ bắt đầu sau 2 tiếng",
+                schedule.getClassroom().getClassName());
     }
 
     private String buildBody(String type, ClassSchedule schedule, User student, LocalDateTime nextClass) {
-        String timeLabel = TYPE_1DAY.equals(type) ? "1 ngày nữa" : "2 tiếng nữa";
         String roomOrLink = schedule.getRoomOrLink() != null ? schedule.getRoomOrLink() : "Chưa cập nhật";
         String note = schedule.getNote() != null ? "\nNội dung: " + schedule.getNote() : "";
 
         return String.format(
             "Xin chào %s,\n\n" +
-            "Lớp học \"%s\" của bạn sẽ bắt đầu sau %s.\n\n" +
+            "Lớp học \"%s\" của bạn sẽ bắt đầu sau 2 tiếng nữa.\n\n" +
             "📅 Ngày: %s\n" +
             "⏰ Giờ: %s – %s\n" +
             "📍 Phòng/Link: %s%s\n\n" +
@@ -174,12 +156,136 @@ public class ReminderService {
             "Trân trọng,\nFLearn System",
             student.getFullName(),
             schedule.getClassroom().getClassName(),
-            timeLabel,
             nextClass.toLocalDate(),
             schedule.getStartTime(),
             schedule.getEndTime() != null ? schedule.getEndTime().toString() : "?",
             roomOrLink,
             note
         );
+    }
+
+    private void checkAndSendAssignmentReminders() {
+        LocalDateTime now = LocalDateTime.now();
+        // 2 hour window +/- WINDOW_MINUTES
+        LocalDateTime startWindow = now.plusHours(2).minusMinutes(WINDOW_MINUTES);
+        LocalDateTime endWindow = now.plusHours(2).plusMinutes(WINDOW_MINUTES);
+        
+        Date start = Date.from(startWindow.atZone(ZoneId.systemDefault()).toInstant());
+        Date end = Date.from(endWindow.atZone(ZoneId.systemDefault()).toInstant());
+
+        // Quizzes
+        List<Quiz> upcomingQuizzes = quizRepository.findUpcomingDeadlines(start, end);
+        for (Quiz quiz : upcomingQuizzes) {
+            if (quiz.getLesson() != null && quiz.getLesson().getClassroom() != null) {
+                List<User> students = enrollmentRepository
+                        .findByClassRoomAndStatus(quiz.getLesson().getClassroom(), EnrollmentStatus.ACTIVE)
+                        .stream().map(Enrollment::getStudent).toList();
+                
+                for (User student : students) {
+                    processQuizReminder(quiz, student);
+                }
+            }
+        }
+
+        // Lessons
+        List<Lesson> upcomingLessons = lessonRepository.findUpcomingDeadlines(start, end);
+        for (Lesson lesson : upcomingLessons) {
+            if (lesson.getClassroom() != null) {
+                List<User> students = enrollmentRepository
+                        .findByClassRoomAndStatus(lesson.getClassroom(), EnrollmentStatus.ACTIVE)
+                        .stream().map(Enrollment::getStudent).toList();
+                
+                for (User student : students) {
+                    processLessonReminder(lesson, student);
+                }
+            }
+        }
+    }
+    
+    private void processQuizReminder(Quiz quiz, User student) {
+        if (student.getEmail() == null || student.getEmail().isBlank()) return;
+
+        // Check if already sent
+        boolean alreadySent = assignmentReminderLogRepository.existsByQuizAndUserAndReminderType(quiz, student, TYPE_2HOURS_ASSIGNMENT);
+        if (alreadySent) return;
+
+        // Check if already completed
+        long submittedCount = quizResultRepository.countByStudentAndQuizAndStatusIn(
+                student, quiz, Arrays.asList(QuizSubmissionStatus.SUBMITTED, QuizSubmissionStatus.LATE)
+        );
+        if (submittedCount > 0) return; // Student already submitted
+
+        String subject = String.format("[FLearn] Nhắc nhở hạn chót: Bài tập \"%s\" sắp hết hạn", quiz.getTitle());
+        String body = String.format(
+                "Xin chào %s,\n\n" +
+                "Bạn có bài tập \"%s\" thuộc lớp \"%s\" sẽ hết hạn vào lúc %s.\n" +
+                "Hãy hoàn thành bài tập trước hạn chót nhé!\n\n" +
+                "Trân trọng,\nFLearn System",
+                student.getFullName(),
+                quiz.getTitle(),
+                quiz.getLesson().getClassroom().getClassName(),
+                quiz.getDeadline().toString()
+        );
+
+        sendAndLogAssignmentReminder(student, subject, body, quiz, null);
+    }
+    
+    private void processLessonReminder(Lesson lesson, User student) {
+        if (student.getEmail() == null || student.getEmail().isBlank()) return;
+
+        // Check if already sent
+        boolean alreadySent = assignmentReminderLogRepository.existsByLessonAndUserAndReminderType(lesson, student, TYPE_2HOURS_ASSIGNMENT);
+        if (alreadySent) return;
+
+        // Check if already completed (viewed all published materials)
+        List<Material> materials = materialRepository.findByLessonAndPublishedTrueOrderByCreatedAtAsc(lesson);
+        if (!materials.isEmpty()) {
+            boolean allViewed = true;
+            for (Material material : materials) {
+                boolean viewed = materialTrackingRepository.findByStudentAndMaterial(student, material)
+                        .map(MaterialTracking::getViewed)
+                        .orElse(false);
+                if (!viewed) {
+                    allViewed = false;
+                    break;
+                }
+            }
+            if (allViewed) return; // Already completed all materials
+        }
+
+        String subject = String.format("[FLearn] Nhắc nhở hạn chót: Bài học \"%s\" sắp hết hạn", lesson.getTitle());
+        String body = String.format(
+                "Xin chào %s,\n\n" +
+                "Bạn có bài học \"%s\" thuộc lớp \"%s\" sẽ hết hạn vào lúc %s.\n" +
+                "Hãy hoàn thành các tài liệu của bài học trước hạn chót nhé!\n\n" +
+                "Trân trọng,\nFLearn System",
+                student.getFullName(),
+                lesson.getTitle(),
+                lesson.getClassroom().getClassName(),
+                lesson.getDeadline().toString()
+        );
+
+        sendAndLogAssignmentReminder(student, subject, body, null, lesson);
+    }
+    
+    private void sendAndLogAssignmentReminder(User student, String subject, String body, Quiz quiz, Lesson lesson) {
+        try {
+            emailService.sendEmail(student.getEmail(), subject, body);
+
+            assignmentReminderLogRepository.save(AssignmentReminderLog.builder()
+                    .quiz(quiz)
+                    .lesson(lesson)
+                    .user(student)
+                    .reminderType(TYPE_2HOURS_ASSIGNMENT)
+                    .sentToEmail(student.getEmail())
+                    .build());
+
+            log.info("[Reminder] Sent 1HOUR assignment reminder → {} for quiz={}, lesson={}", 
+                    student.getEmail(), 
+                    quiz != null ? quiz.getQuizId() : "N/A", 
+                    lesson != null ? lesson.getLessonId() : "N/A");
+        } catch (Exception ex) {
+            log.error("[Reminder] Failed to send assignment email to {}: {}", student.getEmail(), ex.getMessage());
+        }
     }
 }

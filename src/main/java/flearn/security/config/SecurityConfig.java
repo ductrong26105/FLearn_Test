@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép truy cập công khai không cần đăng nhập vào tài nguyên tĩnh và các trang xác thực cơ bản
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/maintenance", "/register", "/login",
-                                "/forgot-password", "/verify-otp", "/reset-password", "/access-denied").permitAll()
+                                "/forgot-password", "/verify-otp", "/reset-password", "/verify-reset-otp", "/access-denied").permitAll()
                         // Phân quyền theo vai trò người dùng (Role-based Authorization)
                         .requestMatchers("/admin/**").hasRole("ADMIN")      // Các URL bắt đầu bằng /admin/ yêu cầu quyền ADMIN
                         .requestMatchers("/teacher/**").hasRole("TEACHER")  // Các URL bắt đầu bằng /teacher/ yêu cầu quyền TEACHER

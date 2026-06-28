@@ -3,13 +3,14 @@ package flearn.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 
 /**
- * ClassSchedule – Lịch học tuần lặp lại của một lớp.
- * Admin tạo lịch: thứ mấy, giờ mấy, phòng/link gì.
- * Hệ thống tự gửi email nhắc nhở trước 1 ngày và 2 tiếng.
+ * ClassSchedule – Lịch học cụ thể của một lớp theo từng ngày.
+ * Admin cấu hình sinh tự động, sau đó có thể sửa từng buổi.
+ * Hệ thống tự gửi email nhắc nhở trước 2 tiếng.
  */
 @Entity
 @Table(name = "[ClassSchedules]")
@@ -26,11 +27,10 @@ public class ClassSchedule {
     private Classroom classroom;
 
     /**
-     * Thứ trong tuần theo chuẩn Java DayOfWeek (1=CN, 2=T2, ..., 7=T7).
-     * Sử dụng java.time.DayOfWeek.getValue() để map.
+     * Ngày học cụ thể (VD: 2026-06-22).
      */
-    @Column(name = "[DayOfWeek]", nullable = false)
-    private Integer dayOfWeek;
+    @Column(name = "[ScheduleDate]", nullable = false)
+    private LocalDate scheduleDate;
 
     /** Giờ bắt đầu buổi học (VD: 08:00). */
     @Column(name = "[StartTime]", nullable = false)

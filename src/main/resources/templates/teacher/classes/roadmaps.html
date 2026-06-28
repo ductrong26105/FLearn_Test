@@ -22,7 +22,7 @@
             
             <div class="page-header d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h1 class="page-title text-dark">Học liệu pre-class (Roadmaps)</h1>
+                    <h1 class="page-title text-dark">Học liệu</h1>
                     <p class="page-subtitle">
                         Lớp học: <strong th:text="${classroom.className}">Class Name</strong>
                     </p>
@@ -41,14 +41,14 @@
                                     <h2 class="h5 fw-bold mb-0 text-dark text-truncate" style="max-width: 200px;" th:text="${roadmap.title}">Roadmap Title</h2>
                                     <span class="badge-status align-self-start"
                                           th:classappend="${roadmap.published ? ' badge-active' : ' badge-pending'}"
-                                          th:text="${roadmap.published ? 'PUBLISHED' : 'DRAFT'}">DRAFT</span>
+                                          th:text="${roadmap.published ? 'Hiện' : 'Ẩn'}">Ẩn</span>
                                 </div>
                                 <p class="text-muted small mb-4" style="height: 4.5em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;" th:text="${roadmap.description != null and !#strings.isEmpty(roadmap.description) ? roadmap.description : 'Chưa có mô tả chi tiết cho roadmap này.'}">Description</p>
                             </div>
                             
                             <div class="pt-3 border-top d-flex flex-wrap align-items-center gap-2">
                                 <a class="btn btn-sm btn-brand px-3" th:href="@{'/teacher/roadmaps/' + ${roadmap.id} + '/edit'}">
-                                    <i class="bi bi-pencil-square"></i> Cấu trúc & Bài học
+                                    <i class="bi bi-journal-text"></i> Cấu trúc &amp; Bài học
                                 </a>
                                 
                                 <div class="dropdown ms-auto">
@@ -56,6 +56,13 @@
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                        <li>
+                                            <button class="dropdown-item py-2" type="button" 
+                                                    data-bs-toggle="modal" th:data-bs-target="'#editRoadmapModal-' + ${roadmap.id}">
+                                                <i class="bi bi-pencil-square me-2 text-primary"></i>Chỉnh sửa thông tin
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form th:action="@{'/teacher/roadmaps/' + ${roadmap.id} + '/publish'}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn Thay đổi trạng thái hiển thị của Roadmap này?');" style="display:inline;">
                                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
@@ -89,6 +96,38 @@
         <footer th:replace="~{fragments/footer :: footer}"></footer>
     </div>
 </div>
+
+<!-- Modal chỉnh sửa Roadmap - đặt ngoài card để tránh nhấp nháy do hover effect -->
+<div th:each="roadmap : ${roadmaps}">
+    <div class="modal fade" th:id="'editRoadmapModal-' + ${roadmap.id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <form th:action="@{'/teacher/roadmaps/' + ${roadmap.id} + '/edit'}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2 text-primary"></i>Chỉnh sửa Roadmap</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body pt-3">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tên Roadmap</label>
+                            <input class="form-control" name="title" th:value="${roadmap.title}" placeholder="Ví dụ: Tuần 1: Nhập môn..." required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Mô tả chi tiết</label>
+                            <textarea class="form-control" name="description" rows="3" th:text="${roadmap.description}" placeholder="Nội dung tóm tắt của roadmap..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-brand"><i class="bi bi-save me-2"></i>Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{fragments/scripts :: scripts}"></div>
 </body>
 </html>

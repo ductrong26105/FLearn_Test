@@ -4,15 +4,16 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class ClassScheduleRequest {
 
-    @NotNull(message = "Vui lòng chọn thứ trong tuần.")
-    @Min(value = 1, message = "Thứ không hợp lệ (1=CN, 2=T2, ..., 7=T7).")
-    @Max(value = 7, message = "Thứ không hợp lệ.")
-    private Integer dayOfWeek;
+    private LocalDate scheduleDate;
+
+    private List<Integer> daysOfWeek;
 
     @NotNull(message = "Vui lòng nhập giờ bắt đầu.")
     @DateTimeFormat(pattern = "HH:mm")

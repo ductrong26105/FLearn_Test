@@ -1,13 +1,13 @@
 package flearn.module.content.controller;
 
 import flearn.security.service.CustomUserDetails;
-import flearn.module.management.dto.request.ClassroomRequest;
 import flearn.module.content.dto.request.LearningLessonRequest;
 import flearn.module.content.dto.request.MaterialRequest;
 import flearn.module.content.dto.request.RoadmapRequest;
 import flearn.module.management.service.ClassroomService;
 import flearn.module.management.service.EnrollmentService;
 import flearn.module.content.service.LearningContentService;
+import flearn.module.schedule.service.ClassScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +17,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+import java.util.Map;
+import flearn.entity.Attendance;
+import flearn.enums.AttendanceStatus;
+import flearn.module.schedule.dto.response.ClassScheduleResponse;
+import flearn.module.schedule.service.AttendanceService;
+
 @Controller
 @RequestMapping("/teacher")
 @RequiredArgsConstructor
@@ -24,10 +31,23 @@ public class TeacherClassController {
     private final ClassroomService classroomService;
     private final EnrollmentService enrollmentService;
     private final LearningContentService learningContentService;
+    private final ClassScheduleService classScheduleService;
+    private final AttendanceService attendanceService;
 
     @GetMapping({"", "/dashboard"})
     public String teacherDashboard() {
         return "redirect:/teacher/classes";
+    }
+
+    /** Trang thời khóa biểu tổng hợp giảng dạy. */
+    @GetMapping("/schedules")
+    public String teacherSchedules(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        List<ClassScheduleResponse> schedules = classScheduleService.getSchedulesByTeacher(userDetails.getUser());
+
+        model.addAttribute("fullName", userDetails.getUser().getFullName());
+        model.addAttribute("schedules", schedules);
+        
+        return "teacher/classes/schedules";
     }
 
     @GetMapping("/classes")
@@ -44,6 +64,10 @@ public class TeacherClassController {
                          Model model) {
         model.addAttribute("classroom", classroomService.getTeacherClassById(id, userDetails.getUser()));
         model.addAttribute("students", enrollmentService.searchActiveStudentsInClass(id, userDetails.getUser(), keyword));
+        long pendingCount = enrollmentService.getClassEnrollments(id, userDetails.getUser()).stream()
+                .filter(e -> "PENDING".equals(e.getStatus()))
+                .count();
+        model.addAttribute("pendingCount", pendingCount);
         model.addAttribute("keyword", keyword);
         return "teacher/classes/detail";
     }
@@ -78,6 +102,7 @@ public class TeacherClassController {
     @PostMapping("/classes/{id}/toggle-invite-code")
     public String toggleInviteCode(@PathVariable Integer id,
                                    @AuthenticationPrincipal CustomUserDetails userDetails,
+                                   @RequestParam(required = false) String redirectUrl,
                                    RedirectAttributes ra) {
         try {
             classroomService.toggleTeacherInviteCode(id, userDetails.getUser());
@@ -85,7 +110,60 @@ public class TeacherClassController {
         } catch (Exception e) {
             ra.addFlashAttribute("errorMsg", e.getMessage());
         }
+        if (redirectUrl != null && !redirectUrl.isEmpty()) {
+            return "redirect:" + redirectUrl;
+        }
         return "redirect:/teacher/classes/" + id;
+    }
+
+    // ==========================================
+    // ATTENDANCE MANAGEMENT
+    // ==========================================
+
+    @GetMapping("/schedules/{scheduleId}/attendance")
+    public String attendanceForm(@PathVariable Integer scheduleId,
+                                 @AuthenticationPrincipal CustomUserDetails userDetails,
+                                 Model model) {
+        ClassScheduleResponse schedule = classScheduleService.getScheduleById(scheduleId);
+        // Kiểm tra quyền giáo viên
+        if (!schedule.getTeacherName().equals(userDetails.getUser().getFullName())) {
+            throw new flearn.common.exception.BusinessException("Bạn không có quyền truy cập lịch học này.");
+        }
+        
+        List<Attendance> attendances = attendanceService.getAttendanceList(scheduleId);
+        
+        model.addAttribute("schedule", schedule);
+        model.addAttribute("attendances", attendances);
+        model.addAttribute("AttendanceStatus", AttendanceStatus.values());
+        
+        return "teacher/classes/attendance";
+    }
+
+    @PostMapping("/schedules/{scheduleId}/attendance")
+    public String saveAttendance(@PathVariable Integer scheduleId,
+                                 @RequestParam Map<String, String> params,
+                                 @AuthenticationPrincipal CustomUserDetails userDetails,
+                                 RedirectAttributes ra) {
+        try {
+            ClassScheduleResponse schedule = classScheduleService.getScheduleById(scheduleId);
+            if (!schedule.getTeacherName().equals(userDetails.getUser().getFullName())) {
+                throw new flearn.common.exception.BusinessException("Bạn không có quyền thao tác.");
+            }
+            
+            // Xử lý params: status_{studentId} và note_{studentId}
+            for (String key : params.keySet()) {
+                if (key.startsWith("status_")) {
+                    Integer studentId = Integer.parseInt(key.substring(7));
+                    AttendanceStatus status = AttendanceStatus.valueOf(params.get(key));
+                    String note = params.getOrDefault("note_" + studentId, "");
+                    attendanceService.updateAttendance(scheduleId, studentId, status, note);
+                }
+            }
+            ra.addFlashAttribute("successMsg", "Đã lưu điểm danh.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("errorMsg", e.getMessage());
+        }
+        return "redirect:/teacher/schedules/" + scheduleId + "/attendance";
     }
 
     // ==========================================
@@ -139,13 +217,8 @@ public class TeacherClassController {
                                   Model model) {
         var roadmap = learningContentService.getTeacherRoadmapWithContent(id, userDetails.getUser());
         model.addAttribute("roadmap", roadmap);
-        model.addAttribute("roadmapRequest", RoadmapRequest.builder()
-                .title(roadmap.getTitle())
-                .description(roadmap.getDescription())
-                .build());
         model.addAttribute("lessonRequest", LearningLessonRequest.builder().orderIndex(0).build());
-        model.addAttribute("formAction", "/teacher/roadmaps/" + id + "/edit");
-        model.addAttribute("pageTitle", "Cap nhat roadmap");
+        model.addAttribute("pageTitle", roadmap.getTitle());
         return "teacher/classes/roadmap-form";
     }
 

@@ -47,7 +47,7 @@ public class TeacherQuizController {
                 .shuffleQuestions(false)
                 .build());
         model.addAttribute("formAction", "/teacher/lessons/" + lessonId + "/quizzes/create");
-        model.addAttribute("pageTitle", "Tạo quiz");
+        model.addAttribute("pageTitle", "Tạo bài tập");
         return "teacher/quizzes/form";
     }
 
@@ -63,7 +63,7 @@ public class TeacherQuizController {
         }
         try {
             quizService.createQuiz(lessonId, userDetails.getUser(), request);
-            redirectAttributes.addFlashAttribute("successMsg", "Đã tạo quiz.");
+            redirectAttributes.addFlashAttribute("successMsg", "Đã tạo bài tập.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
@@ -92,7 +92,7 @@ public class TeacherQuizController {
                 .build());
         model.addAttribute("questionTypes", QuestionType.values());
         model.addAttribute("formAction", "/teacher/quizzes/" + quizId + "/edit");
-        model.addAttribute("pageTitle", "Cấu hình quiz");
+        model.addAttribute("pageTitle", "Chi tiết bài tập");
         return "teacher/quizzes/form";
     }
 
@@ -108,7 +108,7 @@ public class TeacherQuizController {
         }
         try {
             quizService.updateQuiz(quizId, userDetails.getUser(), request);
-            redirectAttributes.addFlashAttribute("successMsg", "Đã cập nhật quiz.");
+            redirectAttributes.addFlashAttribute("successMsg", "Đã cập nhật bài tập.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
@@ -119,13 +119,15 @@ public class TeacherQuizController {
     public String publish(@PathVariable Integer quizId,
                           @AuthenticationPrincipal CustomUserDetails userDetails,
                           RedirectAttributes redirectAttributes) {
+        QuizResponse quiz = quizService.getTeacherQuiz(quizId, userDetails.getUser());
+        Integer lessonId = quiz.getLessonId();
         try {
             quizService.togglePublish(quizId, userDetails.getUser());
-            redirectAttributes.addFlashAttribute("successMsg", "Đã đổi trạng thái publish quiz.");
+            redirectAttributes.addFlashAttribute("successMsg", "Đã đổi trạng thái publish.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
-        return "redirect:/teacher/quizzes/" + quizId + "/edit";
+        return "redirect:/teacher/lessons/" + lessonId + "/quizzes";
     }
 
     @PostMapping("/quizzes/{quizId}/delete")
@@ -136,7 +138,7 @@ public class TeacherQuizController {
         Integer lessonId = quiz.getLessonId();
         try {
             quizService.deleteQuiz(quizId, userDetails.getUser());
-            redirectAttributes.addFlashAttribute("successMsg", "Đã xóa quiz.");
+            redirectAttributes.addFlashAttribute("successMsg", "Đã xóa bài tập.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
@@ -151,7 +153,7 @@ public class TeacherQuizController {
                                  RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMsg", bindingResult.getFieldError().getDefaultMessage());
-            return "redirect:/teacher/quizzes/" + quizId + "/edit";
+            return "redirect:/teacher/quizzes/" + quizId + "/edit?tab=questions";
         }
         try {
             quizService.createQuestion(quizId, userDetails.getUser(), request);
@@ -159,7 +161,7 @@ public class TeacherQuizController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
-        return "redirect:/teacher/quizzes/" + quizId + "/edit";
+        return "redirect:/teacher/quizzes/" + quizId + "/edit?tab=questions";
     }
 
     @GetMapping("/questions/{questionId}/edit")
@@ -191,7 +193,7 @@ public class TeacherQuizController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
-        return "redirect:/teacher/quizzes/" + quizId + "/edit";
+        return "redirect:/teacher/quizzes/" + quizId + "/edit?tab=questions";
     }
 
     @PostMapping("/questions/{questionId}/delete")
@@ -205,7 +207,7 @@ public class TeacherQuizController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
-        return "redirect:/teacher/quizzes/" + quizId + "/edit";
+        return "redirect:/teacher/quizzes/" + quizId + "/edit?tab=questions";
     }
 
     @GetMapping("/quizzes/{quizId}/results")

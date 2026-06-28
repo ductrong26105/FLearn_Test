@@ -73,11 +73,6 @@ public class QuizServiceImpl implements QuizService {
     public void createQuiz(Integer lessonId, User teacher, QuizRequest request) {
         Lesson lesson = findTeacherLesson(lessonId, teacher);
 
-        // Mỗi lesson chỉ được có 1 quiz (ràng buộc DB UNIQUE KEY)
-        if (quizRepository.existsByLesson(lesson)) {
-            throw new BusinessException("Lesson này đã có quiz. Bạn chỉ có thể chỉnh sửa quiz hiện tại.");
-        }
-
         Quiz quiz = Quiz.builder()
                 .lesson(lesson)
                 .title(request.getTitle())

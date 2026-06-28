@@ -15,8 +15,8 @@
     <form class="panel" th:action="@{/teacher/questions/{id}/edit(id=${questionId})}" th:object="${questionRequest}" method="post">
         <div class="panel-body row g-3">
             <div class="col-md-4">
-                <label class="form-label">Loại</label>
-                <select class="form-select" th:field="*{type}">
+                <label class="form-label">Loại câu hỏi</label>
+                <select class="form-select" th:field="*{type}" id="qTypeSelect" onchange="toggleQuestionType()">
                     <option th:each="type : ${questionTypes}" th:value="${type}" th:text="${type}">TYPE</option>
                 </select>
             </div>
@@ -24,28 +24,136 @@
                 <label class="form-label">Thứ tự</label>
                 <input class="form-control" type="number" th:field="*{orderIndex}">
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" id="correctAnswerWrapper">
                 <label class="form-label">Đáp án đúng</label>
-                <select class="form-select" th:field="*{correctAnswer}">
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                    <option value="TRUE">TRUE</option>
-                    <option value="FALSE">FALSE</option>
-                </select>
+                <input type="hidden" th:field="*{correctAnswer}" id="realCorrectAnswer">
+                
+                <div id="uiMultipleChoice" class="d-flex flex-wrap gap-3 mt-2">
+                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="A" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">A</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="B" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">B</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="C" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">C</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="uiRadio" value="D" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">D</label></div>
+                </div>
+                
+                <div id="uiMultiSelect" class="d-flex flex-wrap gap-3 mt-2" style="display:none !important;">
+                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="A" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">A</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="B" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">B</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="C" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">C</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" name="uiCheck" value="D" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">D</label></div>
+                </div>
+                
+                <div id="uiTrueFalse" class="d-flex gap-3 mt-2" style="display:none !important;">
+                    <div class="form-check"><input class="form-check-input" type="radio" name="uiTF" value="TRUE" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">TRUE</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="uiTF" value="FALSE" onchange="syncCorrectAnswer()"> <label class="form-check-label fw-bold">FALSE</label></div>
+                </div>
             </div>
             <div class="col-12">
                 <label class="form-label">Nội dung</label>
                 <textarea class="form-control" rows="3" th:field="*{questionText}" required></textarea>
             </div>
-            <div class="col-md-6"><input class="form-control" th:field="*{optionA}" placeholder="Đáp án A"></div>
-            <div class="col-md-6"><input class="form-control" th:field="*{optionB}" placeholder="Đáp án B"></div>
-            <div class="col-md-6"><input class="form-control" th:field="*{optionC}" placeholder="Đáp án C"></div>
-            <div class="col-md-6"><input class="form-control" th:field="*{optionD}" placeholder="Đáp án D"></div>
+            
+            <!-- Options wrapper -->
+            <div class="col-12" id="optionsContainer">
+                <div class="row g-3">
+                    <div class="col-md-6"><input class="form-control" th:field="*{optionA}" placeholder="Đáp án A"></div>
+                    <div class="col-md-6"><input class="form-control" th:field="*{optionB}" placeholder="Đáp án B"></div>
+                    <div class="col-md-6"><input class="form-control" th:field="*{optionC}" placeholder="Đáp án C"></div>
+                    <div class="col-md-6"><input class="form-control" th:field="*{optionD}" placeholder="Đáp án D"></div>
+                </div>
+            </div>
+            
+            <div class="col-12" id="modelAnswerContainer" style="display:none !important;">
+                <label class="form-label">Đáp án mẫu (đối chiếu cho câu tự luận)</label>
+                <textarea class="form-control" rows="3" th:field="*{modelAnswer}" placeholder="Nhập văn bản đáp án đúng..."></textarea>
+            </div>
+            
             <div class="col-12"><button class="btn btn-brand" type="submit">Lưu câu hỏi</button></div>
         </div>
     </form>
 </main>
+<script>
+    function toggleQuestionType() {
+        const type = document.getElementById('qTypeSelect').value;
+        const optionsContainer = document.getElementById('optionsContainer');
+        const correctAnswerWrapper = document.getElementById('correctAnswerWrapper');
+        const modelAnswerContainer = document.getElementById('modelAnswerContainer');
+        
+        const uiMultipleChoice = document.getElementById('uiMultipleChoice');
+        const uiMultiSelect = document.getElementById('uiMultiSelect');
+        const uiTrueFalse = document.getElementById('uiTrueFalse');
+        
+        // Hide all first
+        uiMultipleChoice.style.setProperty('display', 'none', 'important');
+        uiMultiSelect.style.setProperty('display', 'none', 'important');
+        uiTrueFalse.style.setProperty('display', 'none', 'important');
+        
+        if (type === 'MULTIPLE_CHOICE') {
+            optionsContainer.style.display = 'block';
+            correctAnswerWrapper.style.display = 'block';
+            modelAnswerContainer.style.setProperty('display', 'none', 'important');
+            uiMultipleChoice.style.setProperty('display', 'flex', 'important');
+        } else if (type === 'MULTI_SELECT') {
+            optionsContainer.style.display = 'block';
+            correctAnswerWrapper.style.display = 'block';
+            modelAnswerContainer.style.setProperty('display', 'none', 'important');
+            uiMultiSelect.style.setProperty('display', 'flex', 'important');
+        } else if (type === 'TRUE_FALSE') {
+            optionsContainer.style.display = 'none';
+            correctAnswerWrapper.style.display = 'block';
+            modelAnswerContainer.style.setProperty('display', 'none', 'important');
+            uiTrueFalse.style.setProperty('display', 'flex', 'important');
+        } else if (type === 'ESSAY') {
+            optionsContainer.style.display = 'none';
+            correctAnswerWrapper.style.display = 'none';
+            modelAnswerContainer.style.setProperty('display', 'block', 'important');
+        }
+        
+        syncCorrectAnswer();
+    }
+
+    function syncCorrectAnswer() {
+        const type = document.getElementById('qTypeSelect').value;
+        const realInput = document.getElementById('realCorrectAnswer');
+        
+        if (type === 'MULTIPLE_CHOICE') {
+            const checked = document.querySelector('input[name="uiRadio"]:checked');
+            realInput.value = checked ? checked.value : '';
+        } else if (type === 'MULTI_SELECT') {
+            const checked = Array.from(document.querySelectorAll('input[name="uiCheck"]:checked'));
+            realInput.value = checked.map(cb => cb.value).join(',');
+        } else if (type === 'TRUE_FALSE') {
+            const checked = document.querySelector('input[name="uiTF"]:checked');
+            realInput.value = checked ? checked.value : '';
+        } else if (type === 'ESSAY') {
+            realInput.value = '';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const realInput = document.getElementById('realCorrectAnswer');
+        if (realInput && realInput.value) {
+            const vals = realInput.value.split(',');
+            if (vals.length === 1 && ['A','B','C','D'].includes(vals[0])) {
+                const r = document.querySelector(`input[name="uiRadio"][value="${vals[0]}"]`);
+                if(r) r.checked = true;
+            }
+            vals.forEach(v => {
+                if (['A','B','C','D'].includes(v)) {
+                    const cb = document.querySelector(`input[name="uiCheck"][value="${v}"]`);
+                    if(cb) cb.checked = true;
+                }
+            });
+            if (vals.length === 1 && ['TRUE','FALSE'].includes(vals[0])) {
+                const tf = document.querySelector(`input[name="uiTF"][value="${vals[0]}"]`);
+                if(tf) tf.checked = true;
+            }
+        }
+        
+        const qTypeSelect = document.getElementById('qTypeSelect');
+        if (qTypeSelect) {
+            toggleQuestionType();
+        }
+    });
+</script>
 </body>
 </html>

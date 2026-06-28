@@ -21,9 +21,13 @@ public class AdminLecturerController {
     @GetMapping
     public String lecturers(@RequestParam(required = false) String keyword, Model model) {
         model.addAttribute("teachers", userService.searchUsersByRole(Role.TEACHER, keyword));
-        model.addAttribute("createTeacherRequest", new CreateTeacherRequest());
         model.addAttribute("keyword", keyword);
         return "admin/lecturers/list";
+    }
+
+    @GetMapping("/create")
+    public String createTeacherForm() {
+        return "admin/lecturers/create";
     }
 
     @PostMapping("/create")

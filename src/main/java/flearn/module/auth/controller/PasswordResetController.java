@@ -103,11 +103,16 @@ public class PasswordResetController {
         }
     }
 
-    // =====================================================
-    // /verify-otp — Giữ route cũ chuyển hướng để không bị lỗi 404 nếu người dùng truy cập link cũ
-    // =====================================================
-    @GetMapping("/verify-otp")
-    public String redirectVerifyOtp() {
-        return "redirect:/forgot-password";
+    @PostMapping("/verify-reset-otp")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public org.springframework.http.ResponseEntity<?> verifyResetOtpAjax(
+            @RequestParam String email,
+            @RequestParam String otpCode) {
+        try {
+            passwordResetService.verifyOtp(email.trim(), otpCode.trim());
+            return org.springframework.http.ResponseEntity.ok().body("{\"success\": true}");
+        } catch (RuntimeException e) {
+            return org.springframework.http.ResponseEntity.badRequest().body("{\"success\": false, \"message\": \"" + e.getMessage() + "\"}");
+        }
     }
 }

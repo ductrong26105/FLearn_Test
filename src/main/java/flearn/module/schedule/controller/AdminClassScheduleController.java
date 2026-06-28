@@ -68,7 +68,7 @@ public class AdminClassScheduleController {
         ClassScheduleResponse schedule = classScheduleService.getScheduleById(scheduleId);
         // Map response → request để bind form
         ClassScheduleRequest req = ClassScheduleRequest.builder()
-                .dayOfWeek(schedule.getDayOfWeek())
+                .scheduleDate(schedule.getScheduleDate())
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())
                 .roomOrLink(schedule.getRoomOrLink())

@@ -2,6 +2,7 @@ package flearn.module.schedule.dto.response;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -12,7 +13,7 @@ public class ClassScheduleResponse {
     private String  className;
 
     /** 1=CN, 2=T2, 3=T3, 4=T4, 5=T5, 6=T6, 7=T7 */
-    private Integer dayOfWeek;
+    private LocalDate scheduleDate;
 
     /** Tên thứ hiển thị tiếng Việt (VD: "Thứ 2"). */
     private String  dayOfWeekLabel;
@@ -24,7 +25,9 @@ public class ClassScheduleResponse {
     private Boolean remindOneDayBefore;
     private Boolean remindTwoHoursBefore;
     private Boolean isActive;
+    private String  teacherName;
     private Date    createdAt;
+    private flearn.enums.AttendanceStatus attendanceStatus;
 
     /** Tiện ích: tên thứ tiếng Việt từ dayOfWeek. */
     public static String dayLabel(int dow) {

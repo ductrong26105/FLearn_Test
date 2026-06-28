@@ -56,12 +56,24 @@
                 <span>Lớp học của tôi</span>
             </a>
         </li>
+        <li sec:authorize="hasRole('TEACHER')">
+            <a href="/teacher/schedules" class="sidebar-link" th:classappend="${activePage == 'schedules' ? 'active' : ''}">
+                <i class="bi bi-calendar-week"></i>
+                <span>Thời khóa biểu</span>
+            </a>
+        </li>
 
         <!-- STUDENT MENU -->
         <li sec:authorize="hasRole('STUDENT')">
             <a href="/student/classes" class="sidebar-link" th:classappend="${activePage == 'classes' ? 'active' : ''}">
                 <i class="bi bi-mortarboard-fill"></i>
                 <span>Lớp học</span>
+            </a>
+        </li>
+        <li sec:authorize="hasRole('STUDENT')">
+            <a href="/student/schedules" class="sidebar-link" th:classappend="${activePage == 'schedules' ? 'active' : ''}">
+                <i class="bi bi-calendar-week"></i>
+                <span>Thời khóa biểu</span>
             </a>
         </li>
         <li sec:authorize="hasRole('STUDENT')">

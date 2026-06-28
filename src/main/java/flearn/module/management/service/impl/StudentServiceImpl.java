@@ -72,6 +72,10 @@ public class StudentServiceImpl implements StudentService {
             throw new BusinessException("Lớp hiện không mở cho học sinh tham gia.");
         }
 
+        if (Boolean.FALSE.equals(classroom.getInviteCodeVisible())) {
+            throw new BusinessException("Mã lớp này đang đóng. Không thể tham gia lúc này.");
+        }
+
         if (classroom.getCourse() == null || classroom.getCourse().getStatus() != flearn.enums.CourseStatus.ACTIVE) {
             throw new BusinessException("Khóa học liên kết hiện không ở trạng thái hoạt động.");
         }

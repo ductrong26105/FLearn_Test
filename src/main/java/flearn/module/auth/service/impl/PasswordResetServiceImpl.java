@@ -27,6 +27,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+    private final org.thymeleaf.TemplateEngine templateEngine;
 
     // ==========================================
     // OTP FLOW
@@ -47,11 +48,16 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         user.setOtpExpiry(createExpiry(OTP_EXPIRY_MINUTES));
         userRepository.save(user);
 
-        emailService.sendEmail(
-                user.getEmail(),
-                "FLearn - Mã OTP đặt lại mật khẩu",
-                buildOtpEmail(user.getFullName(), otp)
-        );
+        org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
+        context.setVariable("userName", user.getFullName());
+        context.setVariable("emailAddress", user.getEmail());
+        context.setVariable("otpCode", otp);
+        context.setVariable("expiryMinutes", OTP_EXPIRY_MINUTES);
+        context.setVariable("actionType", "Mã Xác Thực Quên Mật Khẩu");
+        context.setVariable("actionTypeLowerCase", "đặt lại mật khẩu");
+
+        String htmlContent = templateEngine.process("email/otp-email", context);
+        emailService.sendHtmlEmail(user.getEmail(), "FLearn - Mã Xác Thực Đặt Lại Mật Khẩu", htmlContent);
     }
 
     @Override
